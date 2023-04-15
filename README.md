@@ -1,2 +1,5 @@
-# retreat
-Retreat is an experimental financial planning tool
+# Retreat
+
+## About 
+
+Retreat is an experimental financial planning tool.
