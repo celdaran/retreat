@@ -1,16 +1,23 @@
 <?php
 
 namespace Service\Data;
+use \Service\Data\Database;
 
 class Income
 {
+    private $data;
+
     public function __construct()
     {
+        $this->data = new Database();
     }
 
     public function getIncome()
     {
-        // TODO: convert this to a database call, obviously  :)
+        // $income = $this->data->select("SELECT * FROM income");
+        // maybe do stuff to $income
+        // return $income;
+
         return [
             [
                 'name' => 'savings account',

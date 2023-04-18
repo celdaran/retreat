@@ -1,6 +1,7 @@
 <?php
 
 require_once('Service/Engine/Engine.php');
+require_once('Service/Data/Database.php');
 require_once('Service/Data/Income.php');
 require_once('Service/Data/Expense.php');
 

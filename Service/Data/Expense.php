@@ -1,16 +1,23 @@
 <?php
 
 namespace Service\Data;
+use \Service\Data\Database;
 
 class Expense
 {
+    private $data;
+
     public function __construct()
     {
+        $this->data = new Database();
     }
 
     public function getExpense()
     {
-        // TODO: convert this to a database call, obviously  :)
+        // $expense = $this->data->select("SELECT * FROM expense");
+        // maybe do stuff to $expense
+        // return $expense;
+
         return [
             [
                 'name' => 'mortgage',
