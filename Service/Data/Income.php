@@ -1,6 +1,5 @@
-<?php
+<?php namespace Service\Data;
 
-namespace Service\Data;
 use \Service\Data\Database;
 
 class Income

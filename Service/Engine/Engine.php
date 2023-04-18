@@ -1,6 +1,4 @@
-<?php
-
-namespace Service\Engine;
+<?php namespace Service\Engine;
 
 use \Service\Data\Income;
 use \Service\Data\Expense;
