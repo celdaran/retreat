@@ -2,60 +2,25 @@
 
 namespace Service\Engine;
 
+use \Service\Database\Income;
+use \Service\Database\Expense;
+
 class Engine
 {
     private $plan = [];
 
     private $income = [];
-    private $expenses = [];
+    private $expense = [];
 
     private $max_withdrawal = 5000;
 
     public function __construct()
     {
-        $this->income = [
-            [
-                'name' => 'savings account',
-                'opening_balance' => 10000,
-                'current_balance' => 10000,
-                'monthly_withdrawal' => 100,
-                'apr' => 0.025,
-                'begin' => [
-                    'after' => null,
-                    'year' => 2027,
-                    'month' => 1,
-                ],
-                'status' => 'untapped',
-            ],
+        $income = new Income();
+        $expense = new Expense();
 
-            [
-                'name' => 'other savings account',
-                'opening_balance' => 200,
-                'current_balance' => 200,
-                'monthly_withdrawal' => 50,
-                'apr' => 0.01,
-                'begin' => [
-                    'after' => null,
-                    'year' => 2028,
-                    'month' => 2,
-                ],
-                'status' => 'untapped',
-            ],
-
-            [
-                'name' => 'third savings account',
-                'opening_balance' => 1500,
-                'current_balance' => 1500,
-                'monthly_withdrawal' => 75,
-                'apr' => 0.00,
-                'begin' => [
-                    'after' => 1,
-                    'year' => null,
-                    'month' => null,
-                ],
-                'status' => 'untapped',
-            ],
-        ];
+        $this->income = $income->getIncome();
+        $this->expense = $expense->getExpense();
     }
 
     /**
@@ -78,10 +43,17 @@ class Engine
         for ($i = 1; $i <= $months; $i++) {
 
             $income = $this->getIncomeForPeriod($year, $month);
-            $expenses = $this->getExpensesForPeriod($year, $month);
+            $expense = $this->getExpenseForPeriod($year, $month);
 
             // Todo: reinvest monthly surplus into an account somewhere?
-            $this->plan[] = sprintf("%03d,%4d-%02d,+%d,-%d,%d", $i, $year, $month, $income, $expenses, ($income - $expenses));
+            $this->plan[] = [
+                'period' => $i,
+                'year' => $year,
+                'month' => $month,
+                'income' => $income,
+                'expense' => $expense,
+                'surplus' => $income - $expense,
+            ];
 
             if ($month % 12 === 0) {
                 $year++;
@@ -99,7 +71,7 @@ class Engine
     public function render()
     {
         foreach ($this->plan as $p) {
-            print($p . "\n");
+            printf("%03d,%4d-%02d,+%d,-%d,%d\n", $p['period'], $p['year'], $p['month'], $p['income'], $p['expense'], $p['surplus']);
         }
 
         foreach ($this->income as $i) {
@@ -107,7 +79,6 @@ class Engine
             printf("  Current balance: \$%0.2f\n", $i['current_balance']);
             printf("\n");
         }
-
     }
 
     //------------------------------------------------------------------
@@ -187,9 +158,44 @@ class Engine
     /**
      * Get expenses for a given period
      */
-    private function getExpensesForPeriod(int $year, int $month)
+    private function getExpenseForPeriod(int $year, int $month)
     {
-        return 100;
+        // Activate expenses based on current period
+        $i = 0;
+        foreach ($this->expense as $expense) {
+            // If we hit a planned expense, see if it's time to activate it
+            if ($expense['status'] === 'planned') {
+                if (($year >= $expense['begin']['year']) && ($month >= $expense['begin']['month'])) {
+                    print("***DEBUG: Activating expense $i, in year $year month $month, as planned from the start\n");
+                    $this->expense[$i]['status'] = 'active';
+                }
+            }
+            $i++;
+        };
+
+        // Now get amounts, drawing from every participating expense
+        $total = 0;
+        $i = 0;
+        foreach ($this->expense as $expense) {
+            if ($expense['status'] === 'active') {
+                $total += $expense['amount'];
+            }
+            $i++;
+        } 
+
+        // Lastly, has it ended?
+        $i = 0;
+        foreach ($this->expense as $expense) {
+            if ($expense['status'] === 'active') {
+                if (($year >= $expense['end']['year']) && ($month >= $expense['end']['month'])) {
+                    print("***DEBUG: Ending expense $i, in year $year month $month, as planned from the start\n");
+                    $this->expense[$i]['status'] = 'ended';
+                }
+            }
+            $i++;
+        } 
+
+        return $total;
     }
 
 
