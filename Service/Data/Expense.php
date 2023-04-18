@@ -1,6 +1,6 @@
 <?php
 
-namespace Service\Database;
+namespace Service\Data;
 
 class Expense
 {

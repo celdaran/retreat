@@ -2,8 +2,8 @@
 
 namespace Service\Engine;
 
-use \Service\Database\Income;
-use \Service\Database\Expense;
+use \Service\Data\Income;
+use \Service\Data\Expense;
 
 class Engine
 {
