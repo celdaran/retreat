@@ -20,28 +20,42 @@ class Expense
         return [
             [
                 'name' => 'mortgage',
-                'amount' => 1500,
+                'amount' => 1500.00,
                 'begin' => [
-                    'year' => 2027,
+                    'year' => 2026,
                     'month' => 1,
                 ],
                 'end' => [
-                    'year' => 2030,
-                    'month' => 3,
+                    'year' => 2999,
+                    'month' => 12,
                 ],
                 'status' => 'planned',
             ],
 
             [
                 'name' => 'groceries',
-                'amount' => 200,
+                'amount' => 200.00,
                 'begin' => [
-                    'year' => 2027,
-                    'month' => 7,
+                    'year' => 2026,
+                    'month' => 1,
                 ],
                 'end' => [
-                    'year' => 2030,
-                    'month' => 7,
+                    'year' => 2999,
+                    'month' => 12,
+                ],
+                'status' => 'planned',
+            ],
+
+            [
+                'name' => 'cell phone',
+                'amount' => 125.00,
+                'begin' => [
+                    'year' => 2026,
+                    'month' => 1,
+                ],
+                'end' => [
+                    'year' => 2999,
+                    'month' => 12,
                 ],
                 'status' => 'planned',
             ],

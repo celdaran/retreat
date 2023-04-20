@@ -20,13 +20,13 @@ class Income
         return [
             [
                 'name' => 'savings account',
-                'opening_balance' => 10000,
-                'current_balance' => 10000,
-                'monthly_withdrawal' => 100,
-                'apr' => 0.025,
+                'opening_balance' => 1000.00,
+                'current_balance' => 1000.00,
+                'max_withdrawal' => 510.00,
+                'apr' => 2.500,
                 'begin' => [
                     'after' => null,
-                    'year' => 2027,
+                    'year' => 2026,
                     'month' => 1,
                 ],
                 'status' => 'untapped',
@@ -34,28 +34,70 @@ class Income
 
             [
                 'name' => 'other savings account',
-                'opening_balance' => 200,
-                'current_balance' => 200,
-                'monthly_withdrawal' => 50,
-                'apr' => 0.01,
+                'opening_balance' => 200.00,
+                'current_balance' => 200.00,
+                'max_withdrawal' => 50.00,
+                'apr' => 1.000,
                 'begin' => [
-                    'after' => null,
-                    'year' => 2028,
-                    'month' => 2,
+                    'after' => 0,
+                    'year' => null,
+                    'month' => null,
                 ],
                 'status' => 'untapped',
             ],
 
             [
                 'name' => 'third savings account',
-                'opening_balance' => 1500,
-                'current_balance' => 1500,
-                'monthly_withdrawal' => 75,
-                'apr' => 0.00,
+                'opening_balance' => 1500.00,
+                'current_balance' => 1500.00,
+                'max_withdrawal' => 75.00,
+                'apr' => 0.000,
                 'begin' => [
                     'after' => 1,
                     'year' => null,
                     'month' => null,
+                ],
+                'status' => 'untapped',
+            ],
+
+            [
+                'name' => 'social security',
+                'opening_balance' => 250000.00,
+                'current_balance' => 250000.00,
+                'max_withdrawal' => 5000.00,
+                'apr' => 2.100,
+                'begin' => [
+                    'after' => null,
+                    'year' => 2033,
+                    'month' => 2,
+                ],
+                'status' => 'untapped',
+            ],
+
+            [
+                'name' => 'rsu1',
+                'opening_balance' => 1000000.00,
+                'current_balance' => 1000000.00,
+                'max_withdrawal' => 1000000.00,
+                'apr' => 3.015,
+                'begin' => [
+                    'after' => null,
+                    'year' => 2026,
+                    'month' => 1,
+                ],
+                'status' => 'untapped',
+            ],
+
+            [
+                'name' => 'rsu2',
+                'opening_balance' => 500000.00,
+                'current_balance' => 500000.00,
+                'max_withdrawal' => 500000.00,
+                'apr' => 3.015,
+                'begin' => [
+                    'after' => null,
+                    'year' => 2026,
+                    'month' => 1,
                 ],
                 'status' => 'untapped',
             ],
