@@ -16,6 +16,12 @@ class Engine
 
     private $currentPeriod = 1;
 
+    /**
+     * Constructor
+     * Optionally pass in income and/or expense scenario names and this
+     * method preps the engine for running a simulation and rendering
+     * the results.
+     */
     public function __construct(string $expenseScenario = 'base', string $incomeScenario = 'base')
     {
         $expense = new Expense();
