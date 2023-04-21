@@ -2,24 +2,18 @@
 
 use Service\Data\Database;
 
-class Income
+class Income extends Account
 {
-    private $data;
-
-    public function __construct()
+    public function getIncome(string $scenarioName)
     {
-        $this->data = new Database();
+        return $this->getScenario($scenarioName);
     }
 
-    public function getIncome(string $scenario = 'base')
+    public function getScenarios()
     {
-        // $income = $this->data->select("SELECT * FROM income WHERE scenario = $scenario");
-        // maybe do stuff to $income (not "maybe" because we now have inheritance)
-        // return $income;
+        $scenarios = [];
 
-        $assets = [];
-
-        $assets['base'] = [
+        $scenarios['base'] = [
             'description' => 'Base scenario',
             'parent' => null,
             'scenario' => [
@@ -97,7 +91,7 @@ class Income
             ],
         ];
 
-        $assets['alt'] = [
+        $scenarios['alt'] = [
             'description' => 'Same as base, but asset rsu2 begins in March instead',
             'parent' => 'base',
             'scenario' => [
@@ -113,43 +107,7 @@ class Income
             ]
         ];
 
-        if ($assets[$scenario]['parent'] === null) {
-            return $assets[$scenario]['scenario'];
-        } else {
-            $parentScenarioName = $assets[$scenario]['parent'];
-            $parentScenario = $assets[$parentScenarioName]['scenario'];
-            $childScenario = $assets[$scenario]['scenario'];
-
-            // no, start with nothing
-            $mergedScenario = [];
-            foreach ($parentScenario as $scenario) {
-                $mergedScenario[] = $this->merge($scenario, $childScenario);
-            }
-
-            // then loop through the child and overwrite keys
-            /*
-            foreach ($childScenario as $scenario) {
-                foreach ($scenario as $k => $v) {
-                    $this->merge($)
-                }
-            }
-            */
-
-            return $mergedScenario;
-        }
-    }
-
-    private function merge(array $parentScenario, array $children)
-    {
-        $merge = [];
-
-        foreach ($children as $childScenario) {
-            if ($childScenario['name'] === $parentScenario['name']) {
-                return array_merge($parentScenario, $childScenario);
-            }
-        }
-
-        return $parentScenario;
+        return $scenarios;
     }
 
 }

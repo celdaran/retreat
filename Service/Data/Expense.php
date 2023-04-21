@@ -1,27 +1,19 @@
-<?php
-
-namespace Service\Data;
+<?php namespace Service\Data;
 
 use Service\Data\Database;
 
-class Expense
+class Expense extends Account
 {
-    private $data;
-
-    public function __construct()
+    public function getExpense(string $scenarioName)
     {
-        $this->data = new Database();
+        return $this->getScenario($scenarioName);
     }
 
-    public function getExpense(string $scenario = 'base')
+    public function getScenarios()
     {
-        // $expense = $this->data->select("SELECT * FROM expense");
-        // maybe do stuff to $expense (not "maybe" because we now have inheritance)
-        // return $expense;
+        $scenarios = [];
 
-        $expenses = [];
-
-        $expenses['base'] = [
+        $scenarios['base'] = [
             'description' => 'base set of expenses',
             'parent' => null,
             'scenario' => [
@@ -57,7 +49,7 @@ class Expense
             ],
         ];
 
-        $expenses['alt'] = [
+        $scenarios['alt'] = [
             'description' => 'cheaper cell phone plan',
             'parent' => 'base',
             'scenario' => [
@@ -68,42 +60,7 @@ class Expense
             ],
         ];
 
-        if ($expenses[$scenario]['parent'] === null) {
-            return $expenses[$scenario]['scenario'];
-        } else {
-            $parentScenarioName = $expenses[$scenario]['parent'];
-            $parentScenario = $expenses[$parentScenarioName]['scenario'];
-            $childScenario = $expenses[$scenario]['scenario'];
-
-            // no, start with nothing
-            $mergedScenario = [];
-            foreach ($parentScenario as $scenario) {
-                $mergedScenario[] = $this->merge($scenario, $childScenario);
-            }
-
-            // then loop through the child and overwrite keys
-            /*
-            foreach ($childScenario as $scenario) {
-                foreach ($scenario as $k => $v) {
-                    $this->merge($)
-                }
-            }
-            */
-
-            return $mergedScenario;
-        }
+        return $scenarios;
     }
 
-    private function merge(array $parentScenario, array $children)
-    {
-        $merge = [];
-
-        foreach ($children as $childScenario) {
-            if ($childScenario['name'] === $parentScenario['name']) {
-                return array_merge($parentScenario, $childScenario);
-            }
-        }
-
-        return $parentScenario;
-    }
 }
