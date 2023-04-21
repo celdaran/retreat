@@ -14,7 +14,7 @@ class Income
     public function getIncome(string $scenario = 'base')
     {
         // $income = $this->data->select("SELECT * FROM income WHERE scenario = $scenario");
-        // maybe do stuff to $income
+        // maybe do stuff to $income (not "maybe" because we now have inheritance)
         // return $income;
 
         $assets = [];
@@ -119,9 +119,6 @@ class Income
             $parentScenarioName = $assets[$scenario]['parent'];
             $parentScenario = $assets[$parentScenarioName]['scenario'];
             $childScenario = $assets[$scenario]['scenario'];
-
-            // start with the complete parent
-            $mergedScenario = $parentScenario;
 
             // no, start with nothing
             $mergedScenario = [];
