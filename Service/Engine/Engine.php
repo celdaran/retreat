@@ -16,13 +16,13 @@ class Engine
 
     private $currentPeriod = 1;
 
-    public function __construct()
+    public function __construct(string $scenario = 'base')
     {
         $expense = new Expense();
         $income = new Income();
 
         $this->expense = $expense->getExpense();
-        $this->income = $income->getIncome();
+        $this->income = $income->getIncome($scenario);
         $this->log = new Log();
         $this->log->setLevel('OFF');
 
@@ -241,15 +241,15 @@ class Engine
             if ($this->income[$i]['status'] === 'untapped') {
                 // Two ways to tap!
                 // 1. It can follow a previously-depleted source
-                if ($this->income[$i]['begin']['after'] !== null) {
-                    if ($this->income[$this->income[$i]['begin']['after']]['status'] === 'depleted') {
+                if ($this->income[$i]['begin_after'] !== null) {
+                    if ($this->income[$this->income[$i]['begin_after']]['status'] === 'depleted') {
                         $this->log->debug("Activating income source $i, in year $year month $month, after previous source depleted");
                         $this->income[$i]['status'] = 'active';
                     }
                 }
                 // 2. It can begin during a specified year and month
-                if ($this->income[$i]['begin']['after'] === null) {
-                    if (($year >= $this->income[$i]['begin']['year']) && ($month >= $this->income[$i]['begin']['month'])) {
+                if ($this->income[$i]['begin_after'] === null) {
+                    if (($year >= $this->income[$i]['begin_year']) && ($month >= $this->income[$i]['begin_month'])) {
                         $this->log->debug("Activating income source $i, in year $year month $month, as planned from the start");
                         $this->income[$i]['status'] = 'active';
                     }
