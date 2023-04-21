@@ -8,6 +8,6 @@ require_once('Service/Log.php');
 
 use Service\Engine;
 
-$engine = new Service\Engine\Engine('alt');
+$engine = new Service\Engine\Engine('alt', 'alt');
 $engine->run(2026, 1, 12);
 $engine->render();

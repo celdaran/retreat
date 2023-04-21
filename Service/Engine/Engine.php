@@ -16,13 +16,13 @@ class Engine
 
     private $currentPeriod = 1;
 
-    public function __construct(string $scenario = 'base')
+    public function __construct(string $expenseScenario = 'base', string $incomeScenario = 'base')
     {
         $expense = new Expense();
         $income = new Income();
 
-        $this->expense = $expense->getExpense();
-        $this->income = $income->getIncome($scenario);
+        $this->expense = $expense->getExpense($expenseScenario);
+        $this->income = $income->getIncome($incomeScenario);
         $this->log = new Log();
         $this->log->setLevel('OFF');
 
@@ -106,7 +106,7 @@ class Engine
         foreach ($this->expense as $expense) {
             // If we hit a planned expense, see if it's time to activate it
             if ($expense['status'] === 'planned') {
-                if (($year >= $expense['begin']['year']) && ($month >= $expense['begin']['month'])) {
+                if (($year >= $expense['begin_year']) && ($month >= $expense['begin_month'])) {
                     $this->log->debug("Activating expense $i, in year $year month $month, as planned from the start");
                     $this->expense[$i]['status'] = 'active';
                 }
@@ -136,7 +136,7 @@ class Engine
         $i = 0;
         foreach ($this->expense as $expense) {
             if ($expense['status'] === 'active') {
-                if (($year >= $expense['end']['year']) && ($month >= $expense['end']['month'])) {
+                if (($year >= $expense['end_year']) && ($month >= $expense['end_month'])) {
                     $this->log->debug("Ending expense $i, in year $year month $month, as planned from the start");
                     $this->expense[$i]['status'] = 'ended';
                 }
