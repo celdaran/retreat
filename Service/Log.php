@@ -27,6 +27,11 @@ class Log
         $this->_log(5, $message);
     }
 
+    public function info(string $message)
+    {
+        $this->_log(4, $message);
+    }
+
     public function warn(string $message)
     {
         $this->_log(3, $message);
