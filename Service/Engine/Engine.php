@@ -165,8 +165,18 @@ class Engine
         foreach ($this->expense as $expense) {
             if ($expense['status'] === 'active') {
                 if (($year >= $expense['end_year']) && ($month >= $expense['end_month'])) {
-                    $this->log->debug("Ending expense $i, in year $year month $month, as planned from the start");
-                    $this->expense[$i]['status'] = 'ended';
+                    if ($expense['repeat_every'] === null) {
+                        $this->log->debug("Ending expense $i, in year $year month $month, as planned from the start");
+                        $this->expense[$i]['status'] = 'ended';
+                    } else {
+                        $this->log->info("Ending expense $i, in year $year month $month, but rescheduling again " . $expense['repeat_every'] . " months out");
+                        $nextPeriod = $this->addMonths($expense['begin_year'], $expense['begin_month'], $expense['repeat_every']);
+                        $this->expense[$i]['status'] = 'planned';
+                        $this->expense[$i]['begin_year'] = $nextPeriod['year'];
+                        $this->expense[$i]['begin_month'] = $nextPeriod['month'];
+                        $this->expense[$i]['end_year'] = $nextPeriod['year'];
+                        $this->expense[$i]['end_month'] = $nextPeriod['month'];
+                    }
                 }
             }
             $i++;
@@ -315,6 +325,21 @@ class Engine
 
         // Return *just* the interest
         return round($v - $p, 2);
+    }
+
+    public function addMonths(int $year, int $month, int $count)
+    {
+        $newYear = $year + intdiv($count, 12);
+        $newMonth = $month + $count % 12;
+        if ($newMonth > 12) {
+            $newMonth -= 12;
+            $newYear++;
+        }
+
+        return [
+            'year' => $newYear,
+            'month' => $newMonth,
+        ];
     }
 
 }

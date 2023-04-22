@@ -26,6 +26,7 @@ class Expense extends Account
                     'end_year' => 2999,
                     'end_month' => 12,
                     'status' => 'planned',
+                    'repeat_every' => null,
                 ],
 
                 [
@@ -37,6 +38,7 @@ class Expense extends Account
                     'end_year' => 2999,
                     'end_month' => 12,
                     'status' => 'planned',
+                    'repeat_every' => null,
                 ],
 
                 [
@@ -48,6 +50,7 @@ class Expense extends Account
                     'end_year' => 2999,
                     'end_month' => 12,
                     'status' => 'planned',
+                    'repeat_every' => null,
                 ],
 
                 [
@@ -59,6 +62,7 @@ class Expense extends Account
                     'end_year' => 2026,
                     'end_month' => 1,
                     'status' => 'planned',
+                    'repeat_every' => 3,
                 ],
             ],
         ];
