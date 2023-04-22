@@ -3,6 +3,7 @@
 use App\Service\Data\Expense;
 use App\Service\Data\Income;
 use App\Service\Log;
+use App\Service\Engine\Util;
 
 class Engine
 {
@@ -13,6 +14,7 @@ class Engine
     private $income = [];
 
     private $log;
+    private $util;
 
     private $currentPeriod = 1;
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
@@ -29,8 +31,10 @@ class Engine
 
         $this->expense = $expense->getExpense($expenseScenario);
         $this->income = $income->getIncome($incomeScenario);
+
         $this->log = new Log();
         $this->log->setLevel('INFO');
+        $this->util = new Util();
 
         $this->audit = [
             'expense' => [],
@@ -176,7 +180,7 @@ class Engine
                         $this->expense[$i]['status'] = 'ended';
                     } else {
                         $this->log->info("Ending expense $i, in year $year month $month, but rescheduling again " . $expense['repeat_every'] . " months out");
-                        $nextPeriod = $this->addMonths($expense['begin_year'], $expense['begin_month'], $expense['repeat_every']);
+                        $nextPeriod = $this->util->addMonths($expense['begin_year'], $expense['begin_month'], $expense['repeat_every']);
                         $this->expense[$i]['status'] = 'planned';
                         $this->expense[$i]['begin_year'] = $nextPeriod['year'];
                         $this->expense[$i]['begin_month'] = $nextPeriod['month'];
@@ -194,7 +198,7 @@ class Engine
     private function applyInflation()
     {
         for ($i = 0; $i < count($this->expense); $i++) {
-            $this->expense[$i]['amount'] += $this->calculateInterest(
+            $this->expense[$i]['amount'] += $this->util->calculateInterest(
                 $this->expense[$i]['amount'],
                 $this->expense[$i]['inflation_rate']
             );
@@ -307,45 +311,12 @@ class Engine
     {
         for ($i = 0; $i < count($this->income); $i++) {
             if ($this->income[$i]['current_balance'] > 0) {
-                $this->income[$i]['current_balance'] += $this->calculateInterest(
+                $this->income[$i]['current_balance'] += $this->util->calculateInterest(
                     $this->income[$i]['current_balance'],
                     $this->income[$i]['apr']
                 );
             }
         }
-    }
-
-    /**
-     * Calculate compound interest
-     */
-    private function calculateInterest(float $p, float $r): float
-    {
-        // Convert rate
-        $r = $r / 100;
-
-        // Set time
-        $t = 1 / 12;
-
-        // Calculate new value
-        $v = $p * (1 + $r / 12) ** (12 * $t);
-
-        // Return *just* the interest
-        return round($v - $p, 2);
-    }
-
-    public function addMonths(int $year, int $month, int $count)
-    {
-        $newYear = $year + intdiv($count, 12);
-        $newMonth = $month + $count % 12;
-        if ($newMonth > 12) {
-            $newMonth -= 12;
-            $newYear++;
-        }
-
-        return [
-            'year' => $newYear,
-            'month' => $newMonth,
-        ];
     }
 
 }
