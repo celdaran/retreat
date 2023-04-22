@@ -20,6 +20,7 @@ class Expense extends Account
                 [
                     'name' => 'mortgage',
                     'amount' => 1500.00,
+                    'inflation_rate' => 0.000,
                     'begin_year' => 2026,
                     'begin_month' => 1,
                     'end_year' => 2999,
@@ -30,6 +31,7 @@ class Expense extends Account
                 [
                     'name' => 'groceries',
                     'amount' => 200.00,
+                    'inflation_rate' => 5.000,
                     'begin_year' => 2026,
                     'begin_month' => 1,
                     'end_year' => 2999,
@@ -40,10 +42,22 @@ class Expense extends Account
                 [
                     'name' => 'cell phone',
                     'amount' => 125.00,
+                    'inflation_rate' => -2.000,
                     'begin_year' => 2026,
                     'begin_month' => 1,
                     'end_year' => 2999,
                     'end_month' => 12,
+                    'status' => 'planned',
+                ],
+
+                [
+                    'name' => 'sales taxes',
+                    'amount' => 12000.00,
+                    'inflation_rate' => 1.000,
+                    'begin_year' => 2026,
+                    'begin_month' => 1,
+                    'end_year' => 2026,
+                    'end_month' => 1,
                     'status' => 'planned',
                 ],
             ],

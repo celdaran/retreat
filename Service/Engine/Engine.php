@@ -104,8 +104,30 @@ class Engine
 
     /**
      * Get expenses for a given period
+     * This is two passes:
+     * 1) figure out the total expenses in the given period
+     * 2) increasing balances to account for inflation
      */
     private function getExpenseForPeriod(int $year, int $month): float
+    {
+        $expenses = $this->tallyExpenses($year, $month);
+        $this->applyInflation();
+        return $expenses;
+    }
+
+    /**
+     * Adjust income sources per period
+     * This is two passes:
+     * 1) reducing one or more balances per the $expense per period
+     * 2) increasing all balances to account for interest earned
+     */
+    private function adjustIncomeForPeriod(int $year, int $month, float $expense)
+    {
+        $this->makeWithdrawals($year, $month, $expense);
+        $this->earnInterest();
+    }
+
+    private function tallyExpenses(int $year, int $month): float
     {
         // Activate expenses based on current period
         $i = 0;
@@ -153,16 +175,14 @@ class Engine
         return round($total, 2);
     }
 
-    /**
-     * Adjust income sources per period
-     * This is two passes:
-     * 1) reducing one or more balances per the $expense per period
-     * 2) increasing all balances to account for interest earned
-     */
-    private function adjustIncomeForPeriod(int $year, int $month, float $expense)
+    private function applyInflation()
     {
-        $this->makeWithdrawals($year, $month, $expense);
-        $this->earnInterest();
+        for ($i = 0; $i < count($this->expense); $i++) {
+            $this->expense[$i]['amount'] += $this->calculateInterest(
+                $this->expense[$i]['amount'],
+                $this->expense[$i]['inflation_rate']
+            );
+        }
     }
 
     /**
