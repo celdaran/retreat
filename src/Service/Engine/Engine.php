@@ -1,8 +1,8 @@
-<?php namespace Service\Engine;
+<?php namespace App\Service\Engine;
 
-use \Service\Data\Expense;
-use \Service\Data\Income;
-use \Service\Log;
+use App\Service\Data\Expense;
+use App\Service\Data\Income;
+use App\Service\Log;
 
 class Engine
 {

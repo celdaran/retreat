@@ -1,4 +1,4 @@
-<?php namespace Service;
+<?php namespace App\Service;
 
 class Log
 {

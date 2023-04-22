@@ -1,4 +1,4 @@
-<?php namespace Service\Data;
+<?php namespace App\Service\Data;
 
 class Database
 {

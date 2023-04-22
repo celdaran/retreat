@@ -1,6 +1,6 @@
-<?php namespace Service\Data;
+<?php namespace App\Service\Data;
 
-use Service\Data\Database;
+use App\Service\Data\Database;
 
 class Income extends Account
 {
