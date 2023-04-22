@@ -9,6 +9,6 @@ require_once('Service/Log.php');
 
 use Service\Engine\Engine;
 
-$engine = new Engine('alt', 'alt');
+$engine = new Engine(); //'alt', 'alt');
 $engine->run(2026, 1, 12);
-$engine->render();
+$engine->report();

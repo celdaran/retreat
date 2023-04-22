@@ -15,7 +15,7 @@ class Engine
     private $log;
 
     private $currentPeriod = 1;
-
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
     /**
      * Constructor
      * Optionally pass in income and/or expense scenario names and this
@@ -30,7 +30,7 @@ class Engine
         $this->expense = $expense->getExpense($expenseScenario);
         $this->income = $income->getIncome($incomeScenario);
         $this->log = new Log();
-        $this->log->setLevel('OFF');
+        $this->log->setLevel('INFO');
 
         $this->audit = [
             'expense' => [],
@@ -77,13 +77,19 @@ class Engine
         foreach ($this->plan as $p) {
             printf("%03d,%4d-%02d,%d\n", $p['period'], $p['year'], $p['month'], $p['expense']);
         }
+    }
 
+    public function report()
+    {
         foreach ($this->income as $i) {
             printf("Income source: %s\n", $i['name']);
             printf("  Current balance: \$%0.2f\n", $i['current_balance']);
             printf("\n");
         }
+    }
 
+    public function audit()
+    {
         foreach ($this->audit['expense'] as $e) {
             printf("%03d,%4d-%02d,%s,%d,%s\n",
                 $e['period'], $e['year'], $e['month'],
