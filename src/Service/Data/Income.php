@@ -2,112 +2,63 @@
 
 use App\Service\Data\Database;
 
-class Income extends Account
+class Income
 {
-    public function getIncome(string $scenarioName)
+    private Database $data;
+
+    public function __construct()
     {
-        return $this->getScenario($scenarioName);
+        $this->data = new Database();
+        $this->data->connect($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASS'], $_ENV['DBNAME']);
     }
 
-    public function getScenarios()
+    public function getIncome(string $scenarioName)
     {
-        $scenarios = [];
+        // Get the query
+        $sql = $this->fetchAssetQuery();
 
-        $scenarios['base'] = [
-            'description' => 'Base scenario',
-            'parent' => null,
-            'scenario' => [
-                [
-                    'name' => 'savings account',
-                    'opening_balance' => 1000.00,
-                    'current_balance' => 1000.00,
-                    'max_withdrawal' => 510.00,
-                    'apr' => 2.500,
-                    'begin_after' => null,
-                    'begin_year' => 2026,
-                    'begin_month' => 1,
-                    'status' => 'untapped',
-                ],
+        // Get the data
+        $assets = $this->data->select($sql, ['scenario_name' => $scenarioName]);
 
-                [
-                    'name' => 'other savings account',
-                    'opening_balance' => 200.00,
-                    'current_balance' => 200.00,
-                    'max_withdrawal' => 50.00,
-                    'apr' => 1.000,
-                    'begin_after' => 0,
-                    'begin_year' => null,
-                    'begin_month' => null,
-                    'status' => 'untapped',
-                ],
+        return $assets;
+    }
 
-                [
-                    'name' => 'third savings account',
-                    'opening_balance' => 1500.00,
-                    'current_balance' => 1500.00,
-                    'max_withdrawal' => 75.00,
-                    'apr' => 0.000,
-                    'begin_after' => 1,
-                    'begin_year' => null,
-                    'begin_month' => null,
-                    'status' => 'untapped',
-                ],
+    private function fetchAssetQuery()
+    {
+        $sql = "
+            SELECT
+                a.asset_name AS name,
+                SUBSTRING_INDEX(group_concat(a.opening_balance ORDER BY a.asset_id), ',', -1) AS opening_balance,
+                SUBSTRING_INDEX(group_concat(a.opening_balance ORDER BY a.asset_id), ',', -1) AS current_balance,
+                SUBSTRING_INDEX(group_concat(a.max_withdrawal ORDER BY a.asset_id), ',', -1) AS max_withdrawal,
+                SUBSTRING_INDEX(group_concat(a.apr ORDER BY a.asset_id), ',', -1) AS apr,
+                SUBSTRING_INDEX(group_concat(a.begin_after ORDER BY a.asset_id), ',', -1) AS begin_after,
+                SUBSTRING_INDEX(group_concat(a.begin_year ORDER BY a.asset_id), ',', -1) AS begin_year,
+                SUBSTRING_INDEX(group_concat(a.begin_month ORDER BY a.asset_id), ',', -1) AS begin_month,
+                'untapped' AS status
+            FROM (
+                SELECT
+                    a.*
+                FROM scenario s1
+                JOIN asset a ON a.scenario_id = s1.scenario_id
+                WHERE s1.scenario_name = :scenario_name
+                AND s1.account_type_id = 2
+                UNION
+                SELECT
+                    a.*
+                FROM scenario s1
+                LEFT JOIN scenario s2 ON s1.scenario_parent_id = s2.scenario_id
+                JOIN asset a ON a.scenario_id = s2.scenario_id
+                WHERE s1.scenario_name = :scenario_name
+                AND s1.account_type_id = 2
+            
+                ORDER BY asset_id
+            ) AS a
+            GROUP BY a.asset_name
+            ORDER BY a.asset_name
+        ";
 
-                [
-                    'name' => 'social security',
-                    'opening_balance' => 250000.00,
-                    'current_balance' => 250000.00,
-                    'max_withdrawal' => 5000.00,
-                    'apr' => 2.100,
-                    'begin_after' => null,
-                    'begin_year' => 2033,
-                    'begin_month' => 2,
-                    'status' => 'untapped',
-                ],
-
-                [
-                    'name' => 'rsu1',
-                    'opening_balance' => 1000000.00,
-                    'current_balance' => 1000000.00,
-                    'max_withdrawal' => 1000000.00,
-                    'apr' => 3.015,
-                    'begin_after' => null,
-                    'begin_year' => 2026,
-                    'begin_month' => 1,
-                    'status' => 'untapped',
-                ],
-
-                [
-                    'name' => 'rsu2',
-                    'opening_balance' => 500000.00,
-                    'current_balance' => 500000.00,
-                    'max_withdrawal' => 500000.00,
-                    'apr' => 3.015,
-                    'begin_after' => null,
-                    'begin_year' => 2026,
-                    'begin_month' => 1,
-                    'status' => 'untapped',
-                ],
-            ],
-        ];
-
-        $scenarios['alt'] = [
-            'description' => 'Same as base, but asset rsu2 begins in March instead',
-            'parent' => 'base',
-            'scenario' => [
-                [
-                    'name' => 'other savings account',
-                    'max_withdrawal' => 75.00,
-                    'apr' => 1.500,
-                ],
-                [
-                    'name' => 'rsu2',
-                    'begin_month' => 3,
-                ]
-            ]
-        ];
-
-        return $scenarios;
+        return $sql;
     }
 
 }
