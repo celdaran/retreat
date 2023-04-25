@@ -19,14 +19,11 @@ class Database
         }
     }
 
-    public function select(string $query)
+    public function select(string $query, array $parameters = [])
     {
-        $rows = [];
-
-        foreach ($this->dbh->query($query) as $row) {
-            $rows[] = $row;
-        }
-
+        $sth = $this->dbh->prepare($query);
+        $sth->execute($parameters);
+        $rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
         return $rows;
     }
 
