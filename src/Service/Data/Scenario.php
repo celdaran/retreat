@@ -2,12 +2,7 @@
 
 use App\Service\Data\Database;
 
-/**
- * Base class for accounts
- * There are two account types "assets" and "expenses." (For now, debts
- * and liabilities are considered expenses.)
- */
-class Account
+class Scenario
 {
     private Database $data;
 

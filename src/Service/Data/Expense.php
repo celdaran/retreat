@@ -2,7 +2,7 @@
 
 use App\Service\Data\Database;
 
-class Expense extends Account
+class Expense extends Scenario
 {
     protected function fetchQuery()
     {

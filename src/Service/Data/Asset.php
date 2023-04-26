@@ -2,7 +2,7 @@
 
 use App\Service\Data\Database;
 
-class Income extends Account
+class Asset extends Scenario
 {
     protected function fetchQuery()
     {
