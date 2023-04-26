@@ -160,6 +160,88 @@ GROUP BY a.asset_name
 ORDER BY a.asset_name
 ;
 
-select * from asset;
-update asset set asset_name = 'other savings account' where asset_id = 2;
-update asset set asset_name = 'savings account' where asset_id = 1;
+-- final Income.php version
+
+select * from scenario;
+
+            SELECT
+                a.asset_name AS name,
+                SUBSTRING_INDEX(group_concat(a.opening_balance ORDER BY a.asset_id), ',', -1) AS opening_balance,
+                SUBSTRING_INDEX(group_concat(a.opening_balance ORDER BY a.asset_id), ',', -1) AS current_balance,
+                SUBSTRING_INDEX(group_concat(a.max_withdrawal ORDER BY a.asset_id), ',', -1) AS max_withdrawal,
+                SUBSTRING_INDEX(group_concat(a.apr ORDER BY a.asset_id), ',', -1) AS apr,
+                SUBSTRING_INDEX(group_concat(a.begin_after ORDER BY a.asset_id), ',', -1) AS begin_after,
+                SUBSTRING_INDEX(group_concat(a.begin_year ORDER BY a.asset_id), ',', -1) AS begin_year,
+                SUBSTRING_INDEX(group_concat(a.begin_month ORDER BY a.asset_id), ',', -1) AS begin_month,
+                'untapped' AS status
+            FROM (
+                SELECT
+                    a.*
+                FROM scenario s1
+                JOIN asset a ON a.scenario_id = s1.scenario_id
+                WHERE s1.scenario_name = 'alt'
+                AND s1.account_type_id = 2
+                UNION
+                SELECT
+                    a.*
+                FROM scenario s1
+                LEFT JOIN scenario s2 ON s1.scenario_parent_id = s2.scenario_id
+                JOIN asset a ON a.scenario_id = s2.scenario_id
+                WHERE s1.scenario_name = 'alt'
+                AND s1.account_type_id = 2
+            
+                ORDER BY asset_id
+            ) AS a
+            GROUP BY a.asset_name
+            ORDER BY a.asset_name
+;
+
+-- 2023-04-26 now to expenses --
+
+SELECT
+	e.*
+FROM scenario s1
+JOIN expense e ON e.scenario_id = s1.scenario_id
+WHERE s1.scenario_name = 'alt'
+  AND s1.account_type_id = 1
+UNION
+SELECT
+	e.*
+FROM scenario s1
+LEFT JOIN scenario s2 ON s1.scenario_parent_id = s2.scenario_id
+JOIN expense e ON e.scenario_id = s2.scenario_id
+WHERE s1.scenario_name = 'alt'
+  AND s1.account_type_id = 1
+
+ORDER BY expense_id
+;
+
+SELECT
+	e.expense_name,
+    SUBSTRING_INDEX(group_concat(e.amount ORDER BY e.expense_id), ',', -1) as amount,
+    SUBSTRING_INDEX(group_concat(e.begin_year ORDER BY e.expense_id), ',', -1) as begin_year,
+    SUBSTRING_INDEX(group_concat(e.begin_month ORDER BY e.expense_id), ',', -1) as begin_month,
+    SUBSTRING_INDEX(group_concat(e.end_year ORDER BY e.expense_id), ',', -1) as begin_year,
+    SUBSTRING_INDEX(group_concat(e.end_month ORDER BY e.expense_id), ',', -1) as begin_month,
+    SUBSTRING_INDEX(group_concat(e.repeat_every ORDER BY e.expense_id), ',', -1) as repeat_every
+FROM (
+	SELECT
+		e.*
+	FROM scenario s1
+	JOIN expense e ON e.scenario_id = s1.scenario_id
+	WHERE s1.scenario_name = 'alt'
+	  AND s1.account_type_id = 1
+	UNION
+	SELECT
+		e.*
+	FROM scenario s1
+	LEFT JOIN scenario s2 ON s1.scenario_parent_id = s2.scenario_id
+	JOIN expense e ON e.scenario_id = s2.scenario_id
+	WHERE s1.scenario_name = 'alt'
+	  AND s1.account_type_id = 1
+
+	ORDER BY expense_id
+) AS e
+GROUP BY e.expense_name
+ORDER BY e.expense_name
+;
