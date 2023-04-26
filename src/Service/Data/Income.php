@@ -2,28 +2,9 @@
 
 use App\Service\Data\Database;
 
-class Income
+class Income extends Account
 {
-    private Database $data;
-
-    public function __construct()
-    {
-        $this->data = new Database();
-        $this->data->connect($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASS'], $_ENV['DBNAME']);
-    }
-
-    public function getIncome(string $scenarioName)
-    {
-        // Get the query
-        $sql = $this->fetchAssetQuery();
-
-        // Get the data
-        $assets = $this->data->select($sql, ['scenario_name' => $scenarioName]);
-
-        return $assets;
-    }
-
-    private function fetchAssetQuery()
+    protected function fetchQuery()
     {
         $sql = "
             SELECT
