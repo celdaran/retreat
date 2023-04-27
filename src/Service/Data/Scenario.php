@@ -18,7 +18,13 @@ class Scenario
         $sql = $this->fetchQuery();
 
         // Get the data
-        return $this->data->select($sql, ['scenario_name' => $scenarioName]);
+        $rows = $this->data->select($sql, ['scenario_name' => $scenarioName]);
+
+        if (count($rows) === 0) {
+            die("Scenario $scenarioName not found\n");
+        }
+
+        return $rows;
     }
 
 }

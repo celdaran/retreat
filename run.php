@@ -7,6 +7,6 @@ $dotenv->load();
 
 use App\Service\Engine\Engine;
 
-$engine = new Engine(); //'alt', 'alt');
-$engine->run(2026, 1, 12);
+$engine = new Engine('20230426');
+$engine->run(2026, 1, 30*12);
 $engine->report();

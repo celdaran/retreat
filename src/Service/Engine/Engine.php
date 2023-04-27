@@ -24,11 +24,14 @@ class Engine
      * method preps the engine for running a simulation and rendering
      * the results.
      */
-    public function __construct(string $expenseScenario = 'base', string $assetScenario = 'base')
+    public function __construct(string $expenseScenario = 'base', string $assetScenario = null)
     {
         $expense = new Expense();
         $asset = new Asset();
 
+        if ($assetScenario === null) {
+            $assetScenario = $expenseScenario;
+        }
         $this->expense = $expense->getScenario($expenseScenario);
         $this->asset = $asset->getScenario($assetScenario);
 
