@@ -198,11 +198,14 @@ select * from scenario;
 
 -- 2023-04-26 now to expenses --
 
+SELECT * FROM scenario WHERE scenario_name = '20230426';
+SELECT * FROM expense;
+
 SELECT
 	e.*
 FROM scenario s1
 JOIN expense e ON e.scenario_id = s1.scenario_id
-WHERE s1.scenario_name = 'alt'
+WHERE s1.scenario_name = '20230426'
   AND s1.account_type_id = 1
 UNION
 SELECT
@@ -210,7 +213,7 @@ SELECT
 FROM scenario s1
 LEFT JOIN scenario s2 ON s1.scenario_parent_id = s2.scenario_id
 JOIN expense e ON e.scenario_id = s2.scenario_id
-WHERE s1.scenario_name = 'alt'
+WHERE s1.scenario_name = '20230426'
   AND s1.account_type_id = 1
 
 ORDER BY expense_id
@@ -221,15 +224,15 @@ SELECT
     SUBSTRING_INDEX(group_concat(e.amount ORDER BY e.expense_id), ',', -1) as amount,
     SUBSTRING_INDEX(group_concat(e.begin_year ORDER BY e.expense_id), ',', -1) as begin_year,
     SUBSTRING_INDEX(group_concat(e.begin_month ORDER BY e.expense_id), ',', -1) as begin_month,
-    SUBSTRING_INDEX(group_concat(e.end_year ORDER BY e.expense_id), ',', -1) as begin_year,
-    SUBSTRING_INDEX(group_concat(e.end_month ORDER BY e.expense_id), ',', -1) as begin_month,
+    SUBSTRING_INDEX(group_concat(e.end_year ORDER BY e.expense_id), ',', -1) as end_year,
+    SUBSTRING_INDEX(group_concat(e.end_month ORDER BY e.expense_id), ',', -1) as end_month,
     SUBSTRING_INDEX(group_concat(e.repeat_every ORDER BY e.expense_id), ',', -1) as repeat_every
 FROM (
 	SELECT
 		e.*
 	FROM scenario s1
 	JOIN expense e ON e.scenario_id = s1.scenario_id
-	WHERE s1.scenario_name = 'alt'
+	WHERE s1.scenario_name = '20230426'
 	  AND s1.account_type_id = 1
 	UNION
 	SELECT
@@ -237,7 +240,7 @@ FROM (
 	FROM scenario s1
 	LEFT JOIN scenario s2 ON s1.scenario_parent_id = s2.scenario_id
 	JOIN expense e ON e.scenario_id = s2.scenario_id
-	WHERE s1.scenario_name = 'alt'
+	WHERE s1.scenario_name = '20230426'
 	  AND s1.account_type_id = 1
 
 	ORDER BY expense_id
