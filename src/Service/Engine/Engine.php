@@ -37,7 +37,7 @@ class Engine
         $this->asset = $asset->getScenario($assetScenario);
 
         $this->log = new Log();
-        $this->log->setLevel('INFO');
+        $this->log->setLevel($_ENV['LOG_LEVEL']);
         $this->util = new Util();
         $this->fmt = new \NumberFormatter('en_US', \NumberFormatter::CURRENCY);
 
@@ -50,7 +50,7 @@ class Engine
     /**
      * Core function of the engine: to take all inputs and generate a plan
      */
-    public function run(int $startYear, int $startMonth, int $months)
+    public function run(int $startYear, int $startMonth, int $months): bool
     {
         // Track year and month
         $year = $startYear;
@@ -60,7 +60,7 @@ class Engine
         for ($this->currentPeriod = 1; $this->currentPeriod <= $months; $this->currentPeriod++) {
 
             $expense = $this->getExpenseForPeriod($year, $month);
-            $this->adjustAssetForPeriod($year, $month, $expense);
+            if ($this->adjustAssetForPeriod($year, $month, $expense)) {
 
             $this->plan[] = [
                 'period' => $this->currentPeriod,
@@ -72,6 +72,8 @@ class Engine
             if ($month % 12 === 0) {
                 $year++;
                 $month = 0;
+            } else {
+                return false;
             }
 
             $month++;
@@ -136,10 +138,14 @@ class Engine
      * 1) reducing one or more balances per the $expense per period
      * 2) increasing all balances to account for interest earned
      */
-    private function adjustAssetForPeriod(int $year, int $month, float $expense)
+    private function adjustAssetForPeriod(int $year, int $month, float $expense): bool
     {
-        $this->makeWithdrawals($year, $month, $expense);
-        $this->earnInterest();
+        if ($this->makeWithdrawals($year, $month, $expense)) {
+            $this->earnInterest();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function tallyExpenses(int $year, int $month): float
@@ -213,7 +219,7 @@ class Engine
     /**
      * Withdraw money from fund(s) until expense is matched
      */
-    private function makeWithdrawals(int $year, int $month, float $expense)
+    private function makeWithdrawals(int $year, int $month, float $expense): bool
     {
         $total = 0;
 
@@ -276,9 +282,11 @@ class Engine
 
         if ($total < $expense) {
             $this->log->warn("Could not find enough money $total in $year-$month to cover expense $expense");
+            $this->log->warn("Game over, man! Game over! What're we supposed to do now?");
+            return false;
         }
 
-        return;
+        return true;
     }
 
     /**
