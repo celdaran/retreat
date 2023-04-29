@@ -1,5 +1,8 @@
 <?php namespace App\Service\Data;
 
+use PDO;
+use PDOException;
+
 class Database
 {
     private $dbh;
@@ -12,7 +15,7 @@ class Database
     public function connect(string $host, string $username, ?string $password, string $database)
     {
         try {
-            $this->dbh = new \PDO("mysql:host=$host;dbname=$database", $username, $password);
+            $this->dbh = new PDO("mysql:host=$host;dbname=$database", $username, $password);
         } catch (PDOException $e) {
             print "Error connecting to database: " . $e->getMessage() . "\n";
             die();
@@ -23,8 +26,7 @@ class Database
     {
         $sth = $this->dbh->prepare($query);
         $sth->execute($parameters);
-        $rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
-        return $rows;
+        return $sth->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
