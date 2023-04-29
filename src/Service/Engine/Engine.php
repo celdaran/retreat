@@ -62,31 +62,60 @@ class Engine
             $expense = $this->getExpenseForPeriod($year, $month);
             if ($this->adjustAssetForPeriod($year, $month, $expense)) {
 
-            $this->plan[] = [
-                'period' => $this->currentPeriod,
-                'year' => $year,
-                'month' => $month,
-                'expense' => $expense,
-            ];
+                $assets = [];
+                foreach ($this->asset as $asset) {
+                    $assets[$asset['name']] = $asset['current_balance'];
+                }
 
-            if ($month % 12 === 0) {
-                $year++;
-                $month = 0;
+                $planEntry = [
+                    'period' => $this->currentPeriod,
+                    'year' => $year,
+                    'month' => $month,
+                    'expense' => $expense,
+                    'assets' => $assets,
+                ];
+
+                $this->plan[] = $planEntry;
+
+                if ($month % 12 === 0) {
+                    $year++;
+                    $month = 0;
+                }
+
+                $month++;
             } else {
                 return false;
             }
 
-            $month++;
         }
+
+        return true;
     }
 
-    /**
-     * Core function of the engine: to take the plan and render output
-     */
-    public function render()
+    public function assets(): array
     {
+        return $this->asset;
+    }
+
+    public function render($format = 'csv')
+    {
+        printf("%s,%s,%s,", 'period', 'month', 'expense');
+        $i = 0;
         foreach ($this->plan as $p) {
-            printf("%03d,%4d-%02d,%d\n", $p['period'], $p['year'], $p['month'], $p['expense']);
+            if ($i === 0) {
+                if (count($p['assets']) > 0) {
+                    foreach (array_keys($p['assets']) as $assetName) {
+                        printf("\"%s\",", addslashes($assetName));
+                    }
+                }
+                print("\n");
+            }
+            printf("%03d,%4d-%02d,%.2f,", $p['period'], $p['year'], $p['month'], $p['expense']);
+            foreach ($p['assets'] as $asset) {
+                printf("%.2f,", $asset);
+            }
+            print("\n");
+            $i++;
         }
     }
 
