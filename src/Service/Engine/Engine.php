@@ -156,7 +156,7 @@ class Engine
             // If we hit a planned expense, see if it's time to activate it
             if ($expense['status'] === 'planned') {
                 if (($year >= $expense['begin_year']) && ($month >= $expense['begin_month'])) {
-                    $this->log->debug("Activating expense $i, in year $year month $month, as planned from the start");
+                    $this->log->debug("Activating expense {$expense['name']}, in year $year month $month, as planned from the start");
                     $this->expense[$i]['status'] = 'active';
                 }
             }
@@ -187,10 +187,10 @@ class Engine
             if ($expense['status'] === 'active') {
                 if (($year >= $expense['end_year']) && ($month >= $expense['end_month'])) {
                     if ($expense['repeat_every'] === null) {
-                        $this->log->debug("Ending expense $i, in year $year month $month, as planned from the start");
+                        $this->log->debug("Ending expense {$expense['name']}, in year $year month $month, as planned from the start");
                         $this->expense[$i]['status'] = 'ended';
                     } else {
-                        $this->log->info("Ending expense $i, in year $year month $month, but rescheduling again " . $expense['repeat_every'] . " months out");
+                        $this->log->info("Ending expense {$expense['name']}, in year $year month $month, but rescheduling again " . $expense['repeat_every'] . " months out");
                         $nextPeriod = $this->util->addMonths($expense['begin_year'], $expense['begin_month'], $expense['repeat_every']);
                         $this->expense[$i]['status'] = 'planned';
                         $this->expense[$i]['begin_year'] = $nextPeriod['year'];
@@ -259,7 +259,7 @@ class Engine
                     $this->log->debug("  Top-Off amount  = " . ($expense - $total));
                     exit;
                 }
-                $this->log->debug("Pulling $amount to meet $expense from asset $i in $year-$month");
+                $this->log->debug("Pulling $amount to meet $expense from asset {$asset['name']} in $year-$month");
                 $total = round($total + $amount, 2);
 
                 // Reduce balance by withdrawal amount
@@ -271,7 +271,7 @@ class Engine
                     $this->asset[$i]['status'] = 'depleted';
                 }
 
-                $this->log->debug("Current balance of asset $i is " . $this->asset[$i]['current_balance']);
+                $this->log->debug("Current balance of asset {$asset['name']} is " . $this->asset[$i]['current_balance']);
 
                 if ($total === $expense) {
                     // Just hack our way out of this
@@ -302,14 +302,14 @@ class Engine
                 // 1. It can follow a previously-depleted asset
                 if ($this->asset[$i]['begin_after'] !== null) {
                     if ($this->asset[$this->asset[$i]['begin_after']]['status'] === 'depleted') {
-                        $this->log->debug("Activating asset $i, in year $year month $month, after previous asset depleted");
+                        $this->log->debug("Activating asset {$this->asset[$i]['name']}, in year $year month $month, after previous asset depleted");
                         $this->asset[$i]['status'] = 'active';
                     }
                 }
                 // 2. It can begin during a specified year and month
                 if ($this->asset[$i]['begin_after'] === null) {
                     if (($year >= $this->asset[$i]['begin_year']) && ($month >= $this->asset[$i]['begin_month'])) {
-                        $this->log->debug("Activating asset $i, in year $year month $month, as planned from the start");
+                        $this->log->debug("Activating asset {$this->asset[$i]['name']}, in year $year month $month, as planned from the start");
                         $this->asset[$i]['status'] = 'active';
                     }
                 }
