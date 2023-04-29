@@ -16,15 +16,15 @@ CREATE TABLE `scenario` (
   `scenario_descr` varchar(255),
   `account_type_id` integer,
   `scenario_parent_id` integer,
-  `created_at` timestamp DEFAULT (now()),
-  `modified_at` timestamp DEFAULT (now())
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `modified_at` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `account_type` (
   `account_type_id` integer PRIMARY KEY,
   `account_type_descr` varchar(255),
-  `created_at` timestamp DEFAULT (now()),
-  `modified_at` timestamp DEFAULT (now())
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `modified_at` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `expense` (
@@ -39,8 +39,8 @@ CREATE TABLE `expense` (
   `end_year` integer,
   `end_month` integer,
   `repeat_every` integer,
-  `created_at` timestamp DEFAULT (now()),
-  `modified_at` timestamp DEFAULT (now())
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `modified_at` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE `asset` (
@@ -54,8 +54,8 @@ CREATE TABLE `asset` (
   `begin_after` integer,
   `begin_year` integer,
   `begin_month` integer,
-  `created_at` timestamp DEFAULT (now()),
-  `modified_at` timestamp DEFAULT (now())
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `modified_at` timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE `scenario` ADD FOREIGN KEY (`account_type_id`) REFERENCES `account_type` (`account_type_id`);
