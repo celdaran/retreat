@@ -196,15 +196,16 @@ class Engine
         $total = 0.00;
         $i = 0;
         foreach ($this->expense as $expense) {
-            $this->audit['expense'][] = [
-                'period' => $this->currentPeriod,
-                'year' => $year,
-                'month' => $month,
-                'name' => $expense['name'],
-                'amount' => $expense['amount'],
-                'status' => $expense['status'],
-            ];
             if ($expense['status'] === 'active') {
+                $this->log->debug(sprintf('Adding expense %s, amount %d to period tally', $expense['name'], $expense['amount']));
+                $this->audit['expense'][] = [
+                    'period' => $this->currentPeriod,
+                    'year' => $year,
+                    'month' => $month,
+                    'name' => $expense['name'],
+                    'amount' => $expense['amount'],
+                    'status' => $expense['status'],
+                ];
                 $total += $expense['amount'];
             }
             $i++;
