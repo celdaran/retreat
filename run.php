@@ -13,6 +13,11 @@ $dotenv->load();
 $climate = new CLImate();
 $climate->arguments->add(
     [
+        'help' => [
+            'prefix' => '?',
+            'longPrefix' => 'help',
+            'noValue'     => true,
+        ],
         'expense' => [
             'prefix' => 'e',
             'longPrefix' => 'expense',
@@ -23,21 +28,53 @@ $climate->arguments->add(
             'prefix' => 'a',
             'longPrefix' => 'asset',
             'description' => 'Specify the name of the asset scenario',
-            'defaultValue' => 'defaults to expense scenario',
+            'defaultValue' => 'same as expense',
+        ],
+        'startYear' => [
+            'prefix' => 'y',
+            'longPrefix' => 'year',
+            'description' => 'The start year of the simulation',
+            'defaultValue' => 2026,
+        ],
+        'startMonth' => [
+            'prefix' => 'm',
+            'longPrefix' => 'month',
+            'description' => 'The start month of the simulation',
+            'defaultValue' => 1,
+        ],
+        'duration' => [
+            'prefix' => 'd',
+            'longPrefix' => 'duration',
+            'description' => 'The duration, in months, of the simulation',
+            'defaultValue' => 360,
+        ],
+        'adjust' => [
+            'prefix' => 'a',
+            'longPrefix' => 'adjust',
+            'description' => 'Adjust the start year and month to match the simulation start year and month. By default, each expense and asset begins in a pre-defined period, persisted to the database. However, for non-fixed-period expenses and assets, this value can be overridden by the simulation\'s start period.',
+            'noValue'     => true,
         ],
     ]
 );
 $climate->arguments->parse();
 
+if ($climate->arguments->get('help')) {
+    $climate->usage();
+    exit;
+}
+
 $expenseScenario = $climate->arguments->get('expense');
 $assetScenario = $climate->arguments->get('asset');
+$startYear = $climate->arguments->get('startYear');
+$startMonth = $climate->arguments->get('startMonth');
+$duration = $climate->arguments->get('duration');
 
-if ($assetScenario === 'defaults to expense scenario') {
+if ($assetScenario === 'same as expense') {
     $assetScenario = $expenseScenario;
 }
 
 $engine = new Engine($expenseScenario, $assetScenario);
-$success = $engine->run(2026, 1, 5*12);
+$success = $engine->run($startYear, $startMonth, $duration);
 if (!$success) {
     echo "Something went wrong. Starting audit...\n";
     $engine->audit();
