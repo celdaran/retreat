@@ -3,21 +3,23 @@
 use App\Service\Data\Expense;
 use App\Service\Data\Asset;
 use App\Service\Log;
-use App\Service\Engine\Util;
 
 class Engine
 {
-    private $plan = [];
-    private $audit = [];
+    private array $plan = [];
+    private array $audit = [];
 
-    private $expense = [];
-    private $asset = [];
+    private string $expenseScenario;
+    private string $assetScenario;
 
-    private $log;
-    private $util;
-    private $fmt;
+    private array $expense = [];
+    private array $asset = [];
 
-    private $currentPeriod = 1;
+    private Log $log;
+    private Util $util;
+    private \NumberFormatter $fmt;
+
+    private int $currentPeriod = 1;
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
     /**
      * Constructor

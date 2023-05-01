@@ -1,12 +1,10 @@
 <?php namespace App\Service\Data;
 
-use App\Service\Data\Database;
-
 class Expense extends Scenario
 {
-    protected function fetchQuery()
+    protected function fetchQuery(): string
     {
-        $sql = "
+        return "
             SELECT
                 e.expense_name AS name,
                 SUBSTRING_INDEX(group_concat(e.amount ORDER BY e.expense_id), ',', -1) AS amount,
@@ -38,7 +36,6 @@ class Expense extends Scenario
             GROUP BY e.expense_name
             ORDER BY e.expense_name
         ";
-
-        return $sql;
     }
+
 }

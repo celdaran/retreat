@@ -1,12 +1,10 @@
 <?php namespace App\Service\Data;
 
-use App\Service\Data\Database;
-
 class Asset extends Scenario
 {
-    protected function fetchQuery()
+    protected function fetchQuery(): string
     {
-        $sql = "
+        return "
             SELECT
                 a.asset_name AS name,
                 SUBSTRING_INDEX(group_concat(a.opening_balance ORDER BY a.asset_id), ',', -1) AS opening_balance,
@@ -38,8 +36,6 @@ class Asset extends Scenario
             GROUP BY a.asset_name
             ORDER BY a.asset_name
         ";
-
-        return $sql;
     }
 
 }
