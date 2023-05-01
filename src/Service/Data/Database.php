@@ -24,10 +24,15 @@ class Database
 
     public function select(string $query, array $parameters = [])
     {
-        $sth = $this->dbh->prepare($query);
-        $sth->execute($parameters);
+        $sth = $this->exec($query, $parameters);
         return $sth->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function exec(string $query, array $parameters = [])
+    {
+        $sth = $this->dbh->prepare($query);
+        $sth->execute($parameters);
+        return $sth;
+    }
 
 }
