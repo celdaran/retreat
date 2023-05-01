@@ -14,6 +14,7 @@ class Asset extends Scenario
                 SUBSTRING_INDEX(group_concat(a.begin_after ORDER BY a.asset_id), ',', -1) AS begin_after,
                 SUBSTRING_INDEX(group_concat(a.begin_year ORDER BY a.asset_id), ',', -1) AS begin_year,
                 SUBSTRING_INDEX(group_concat(a.begin_month ORDER BY a.asset_id), ',', -1) AS begin_month,
+                SUBSTRING_INDEX(group_concat(a.fixed_period ORDER BY a.asset_id), ',', -1) AS fixed_period,
                 'untapped' AS status
             FROM (
                 SELECT

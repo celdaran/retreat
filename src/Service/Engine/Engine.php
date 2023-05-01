@@ -29,14 +29,12 @@ class Engine
      */
     public function __construct(string $expenseScenario = 'base', string $assetScenario = null)
     {
-        $expense = new Expense();
-        $asset = new Asset();
-
+        $this->expenseScenario = $expenseScenario;
         if ($assetScenario === null) {
-            $assetScenario = $expenseScenario;
+            $this->assetScenario = $expenseScenario;
+        } else {
+            $this->assetScenario = $assetScenario;
         }
-        $this->expense = $expense->getScenario($expenseScenario);
-        $this->asset = $asset->getScenario($assetScenario);
 
         $this->log = new Log();
         $this->log->setLevel($_ENV['LOG_LEVEL']);
@@ -54,6 +52,19 @@ class Engine
      */
     public function run(int $startYear, int $startMonth, int $months): bool
     {
+        // Instantiate main classes
+        $expense = new Expense();
+        $asset = new Asset();
+
+        // Fetch scenarios
+        $this->expense = $expense->getScenario($this->expenseScenario);
+        $this->asset = $asset->getScenario($this->assetScenario);
+
+        // Adjust in-memory scenarios based on requested start period
+        // TODO: make this optional
+        $this->adjustScenario($this->expense, $startYear, $startMonth);
+        $this->adjustScenario($this->asset, $startYear, $startMonth);
+
         // Track year and month
         $year = $startYear;
         $month = $startMonth;
@@ -149,6 +160,17 @@ class Engine
     //------------------------------------------------------------------
     // Private functions
     //------------------------------------------------------------------
+
+    private function adjustScenario(array &$scenario, int $startYear, int $startMonth)
+    {
+        for ($i = 0; $i < count($scenario); $i++) {
+            if ($scenario[$i]['fixed_period'] !== 1) {
+                // If it's not fixed, then it's subject to adjustment
+                $scenario[$i]['begin_year'] = $startYear;
+                $scenario[$i]['begin_month'] = $startMonth;
+            }
+        }
+    }
 
     /**
      * Get expenses for a given period

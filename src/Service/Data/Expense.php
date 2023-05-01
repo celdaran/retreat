@@ -14,6 +14,7 @@ class Expense extends Scenario
                 SUBSTRING_INDEX(group_concat(e.end_year ORDER BY e.expense_id), ',', -1) AS end_year,
                 SUBSTRING_INDEX(group_concat(e.end_month ORDER BY e.expense_id), ',', -1) AS end_month,
                 SUBSTRING_INDEX(group_concat(e.repeat_every ORDER BY e.expense_id), ',', -1) AS repeat_every,
+                SUBSTRING_INDEX(group_concat(e.fixed_period ORDER BY e.expense_id), ',', -1) AS fixed_period,
                 'planned' AS status
             FROM (
                 SELECT
