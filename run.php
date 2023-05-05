@@ -34,13 +34,13 @@ $climate->arguments->add(
             'prefix' => 'y',
             'longPrefix' => 'year',
             'description' => 'The start year of the simulation',
-            'defaultValue' => 2026,
+            'defaultValue' => null,
         ],
         'startMonth' => [
             'prefix' => 'm',
             'longPrefix' => 'month',
             'description' => 'The start month of the simulation',
-            'defaultValue' => 1,
+            'defaultValue' => null,
         ],
         'duration' => [
             'prefix' => 'd',
@@ -73,8 +73,16 @@ if ($assetScenario === 'same as expense') {
     $assetScenario = $expenseScenario;
 }
 
+if ($startYear === "") {
+    $startYear = null;
+}
+
+if ($startMonth === "") {
+    $startMonth = null;
+}
+
 $engine = new Engine($expenseScenario, $assetScenario);
-$success = $engine->run($startYear, $startMonth, $duration);
+$success = $engine->run($duration, $startYear, $startMonth);
 if (!$success) {
     echo "Something went wrong. Starting audit...\n";
     $engine->audit();

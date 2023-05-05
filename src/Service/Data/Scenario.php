@@ -27,4 +27,21 @@ class Scenario
         return $rows;
     }
 
+    public function getStart(?int $startYear, ?int $startMonth): array
+    {
+        if ($startYear === null) {
+            $sql = "SELECT min(begin_year) AS startYear FROM expense";
+            $rows = $this->data->select($sql);
+            $startYear = $rows[0]['startYear'];
+        }
+
+        if ($startMonth === null) {
+            $sql = "SELECT min(begin_month) AS startMonth FROM expense WHERE begin_year = :begin_year";
+            $rows = $this->data->select($sql, ['begin_year' => $startYear]);
+            $startMonth = $rows[0]['startMonth'];
+        }
+
+        return [$startYear, $startMonth];
+    }
+
 }

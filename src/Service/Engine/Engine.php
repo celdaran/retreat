@@ -51,7 +51,7 @@ class Engine
     /**
      * Core function of the engine: to take all inputs and generate a plan
      */
-    public function run(int $startYear, int $startMonth, int $months): bool
+    public function run(int $months, ?int $startYear, ?int $startMonth): bool
     {
         // Instantiate main classes
         $expense = new Expense();
@@ -67,8 +67,7 @@ class Engine
         $this->adjustScenario($this->asset, $startYear, $startMonth);
 
         // Track year and month
-        $year = $startYear;
-        $month = $startMonth;
+        [$year, $month] = $expense->getStart($startYear, $startMonth);
 
         // Loop until the requested number of months have passed.
         for ($this->currentPeriod = 1; $this->currentPeriod <= $months; $this->currentPeriod++) {
