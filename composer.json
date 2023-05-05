@@ -4,7 +4,7 @@
     "description": "A simple retirement planning tool.",
     "license": "MIT",
     "require": {
-        "php": "^7.3|^8.0",
+        "php": "^7.4|^8.0",
         "ext-intl": "*",
         "ext-pdo": "*",
         "vlucas/phpdotenv": "^5.5",
