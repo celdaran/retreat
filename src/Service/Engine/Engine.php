@@ -124,7 +124,7 @@ class Engine
 
     public function render($format = 'csv')
     {
-        printf("%s,%s,%s,", 'period', 'month', 'expense');
+        printf("%s,%s,%s,,", 'period', 'month', 'expense');
         $i = 0;
         foreach ($this->plan as $p) {
             if ($i === 0) {
@@ -133,13 +133,15 @@ class Engine
                         printf("\"%s\",", addslashes($assetName));
                     }
                 }
-                print("\n");
+                print("total assets\n");
             }
-            printf("%03d,%4d-%02d,%.2f,", $p['period'], $p['year'], $p['month'], $p['expense']);
+            $totalAssets = 0.00;
+            printf("%03d,%4d-%02d,%.2f,,", $p['period'], $p['year'], $p['month'], $p['expense']);
             foreach ($p['assets'] as $asset) {
                 printf("%.2f,", $asset);
+                $totalAssets += $asset;
             }
-            print("\n");
+            print("$totalAssets\n");
             $i++;
         }
     }
