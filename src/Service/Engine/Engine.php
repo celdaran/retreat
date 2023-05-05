@@ -63,8 +63,10 @@ class Engine
 
         // Adjust in-memory scenarios based on requested start period
         // TODO: make this optional
+        /*
         $this->adjustScenario($this->expense, $startYear, $startMonth);
         $this->adjustScenario($this->asset, $startYear, $startMonth);
+        */
 
         // Track year and month
         [$year, $month] = $expense->getStart($startYear, $startMonth);
