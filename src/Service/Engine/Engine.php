@@ -315,29 +315,24 @@ class Engine
                     $expense,                               // When the full expense can be pulled from the source
                     $this->asset[$i]['max_withdrawal'],     // If there's a max, cap this period's withdrawal
                     $this->asset[$i]['current_balance'],    // Sometimes the current balance is the most we can pull
-                    ($expense - $total),                    // And sometimes it's just the small amount we need
+#                    ($expense - $total),                    // And sometimes it's just the small amount we need
                 ), 2);
 
-                if ($amount === 0.00) {
+                if ($amount <= 0.00) {
                     $this->log->debug("Got a withdrawal amount near zero while pulling from asset $i");
                     $this->log->debug("  Amount          = $amount");
                     $this->log->debug("  Target Expense  = $expense");
                     $this->log->debug("  Max Withdrawal  = " . $this->asset[$i]['max_withdrawal']);
                     $this->log->debug("  Current Balance = " . $this->asset[$i]['current_balance']);
                     $this->log->debug("  Top-Off amount  = " . ($expense - $total));
-                    exit;
+                    $this->asset[$i]['status'] = 'depleted';
+                    $this->asset[$i]['current_balance'] = 0.00;
                 }
                 $this->log->debug("Pulling $amount to meet $expense from asset {$asset['name']} in $year-$month");
                 $total = round($total + $amount, 2);
 
                 // Reduce balance by withdrawal amount
                 $this->asset[$i]['current_balance'] -= $amount;
-
-                // If we just depleted this asset, activate the next one(s)
-                if ($this->asset[$i]['current_balance'] <= 0) {
-                    $this->asset[$i]['current_balance'] = 0;
-                    $this->asset[$i]['status'] = 'depleted';
-                }
 
                 $this->log->debug("Current balance of asset {$asset['name']} is " . $this->asset[$i]['current_balance']);
 
