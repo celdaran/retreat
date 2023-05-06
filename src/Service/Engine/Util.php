@@ -5,7 +5,7 @@ class Util {
     /**
      * Calculate compound interest
      */
-    public function calculateInterest(float $p, float $r): float
+    public static function calculateInterest(float $p, float $r): float
     {
         // Convert rate
         $r = $r / 100;

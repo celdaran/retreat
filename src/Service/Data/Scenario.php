@@ -1,22 +1,34 @@
 <?php namespace App\Service\Data;
 
-use App\Service\Data\Database;
+use App\Service\Engine\Period;
+use App\Service\Log;
 
 class Scenario
 {
     private Database $data;
+    private Log $log;
 
     public function __construct()
     {
         $this->data = new Database();
         $this->data->connect($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASS'], $_ENV['DBNAME']);
+
+        $this->log = new Log();
+        $this->log->setLevel($_ENV['LOG_LEVEL']);
     }
 
-    public function getScenario(string $scenarioName)
+    public function getData(): Database
     {
-        // Get the query
-        $sql = $this->fetchQuery();
+        return $this->data;
+    }
 
+    public function getLog(): Log
+    {
+        return $this->log;
+    }
+
+    protected function getRowsForScenario(string $scenarioName, string $sql): array
+    {
         // Get the data
         $rows = $this->data->select($sql, ['scenario_name' => $scenarioName]);
 
@@ -25,23 +37,6 @@ class Scenario
         }
 
         return $rows;
-    }
-
-    public function getStart(?int $startYear, ?int $startMonth): array
-    {
-        if ($startYear === null) {
-            $sql = "SELECT min(begin_year) AS startYear FROM expense";
-            $rows = $this->data->select($sql);
-            $startYear = $rows[0]['startYear'];
-        }
-
-        if ($startMonth === null) {
-            $sql = "SELECT min(begin_month) AS startMonth FROM expense WHERE begin_year = :begin_year";
-            $rows = $this->data->select($sql, ['begin_year' => $startYear]);
-            $startMonth = $rows[0]['startMonth'];
-        }
-
-        return [$startYear, $startMonth];
     }
 
 }
