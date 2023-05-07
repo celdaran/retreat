@@ -78,21 +78,19 @@ class Engine
 
             // Keep a running total for tax purposes
             $this->annualIncome->add($expense->value());
-            $this->log->debug("Annual income in period {$this->currentPeriod->getCurrentPeriod()} is {$this->annualIncome->value()}");
+            $this->log->debug("Annual income in period {$this->currentPeriod->getCurrentPeriod()} is {$this->annualIncome->formatted()}");
 
             // If we're in the fourth period, calculate taxes
             // Note: this has issues. But it's good enough
             if ($this->currentPeriod->getCurrentPeriod() % 12 === 4) {
-                $taxAmount = $this->annualIncome * 0.18;
+                $taxAmount = $this->annualIncome->value() * 0.18;
                 $expense->add($taxAmount);
                 $this->log->debug("Paying income tax of $taxAmount in period {$this->currentPeriod->getCurrentPeriod()}");
                 $this->annualIncome->assign(0.00);
             }
 
             // Now adjust assets based on current expenses
-            if (!$this->adjustAssetForPeriod($expense)) {
-                return false;
-            }
+            $this->adjustAssetForPeriod($expense);
 
             // Lastly record the plan
             $planEntry = [
@@ -196,13 +194,15 @@ class Engine
      * 1) reducing one or more balances per the $expense per period
      * 2) increasing all balances to account for interest earned
      */
-    private function adjustAssetForPeriod(Money $expense): bool
+    private function adjustAssetForPeriod(Money $expense)
     {
-        if ($this->assetCollection->makeWithdrawals($this->currentPeriod, $expense)) {
-            $this->assetCollection->earnInterest();
-            return true;
-        } else {
-            return false;
+        $total = $this->assetCollection->makeWithdrawals($this->currentPeriod, $expense);
+        $this->assetCollection->earnInterest();
+
+        if ($total->value() < $expense->value()) {
+            // If we couldn't get enough assets to meet expenses, then
+            // reduce expenses to meet the available assets
+            $expense->assign($total->value());
         }
     }
 

@@ -1,6 +1,5 @@
 <?php namespace App\Service\Data;
 
-use App\Service\Engine\Period;
 use App\Service\Log;
 
 class Scenario
@@ -10,11 +9,16 @@ class Scenario
 
     public function __construct()
     {
-        $this->data = new Database();
-        $this->data->connect($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASS'], $_ENV['DBNAME']);
-
         $this->log = new Log();
         $this->log->setLevel($_ENV['LOG_LEVEL']);
+
+        try {
+            $this->data = new Database();
+            $this->data->connect($_ENV['DBHOST'], $_ENV['DBUSER'], $_ENV['DBPASS'], $_ENV['DBNAME']);
+        } catch (\Exception $e) {
+            $this->log->warn($e->getMessage());
+        }
+
     }
 
     public function getData(): Database

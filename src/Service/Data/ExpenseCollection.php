@@ -22,12 +22,18 @@ class ExpenseCollection extends Scenario
 
     /**
      * Primarily for unit testing
-     * @param array $scenario
-     * @noinspection PhpUnused
+     * @param string $scenarioName
+     * @param array $scenarios
      */
-    public function setScenario(array $scenario)
+    public function loadScenarioFromMemory(string $scenarioName, array $scenarios)
     {
-        $this->expenses = $scenario;
+        $rows = $scenarios[$scenarioName];
+        $this->expenses = $this->transform($rows);
+    }
+
+    public function getExpenses(): array
+    {
+        return $this->expenses;
     }
 
     /**
@@ -145,7 +151,7 @@ class ExpenseCollection extends Scenario
     {
         return "
             SELECT
-                e.expense_name AS name,
+                e.expense_name AS expense_name,
                 SUBSTRING_INDEX(group_concat(e.amount ORDER BY e.expense_id), ',', -1) AS amount,
                 SUBSTRING_INDEX(group_concat(e.inflation_rate ORDER BY e.inflation_rate), ',', -1) AS inflation_rate,
                 SUBSTRING_INDEX(group_concat(e.begin_year ORDER BY e.expense_id), ',', -1) AS begin_year,
@@ -190,7 +196,7 @@ class ExpenseCollection extends Scenario
         foreach ($rows as $row) {
             $expense = new Expense();
             $expense
-                ->setName($row['name'])
+                ->setName($row['expense_name'])
                 ->setAmount(new Money((float)$row['amount']))
                 ->setInflationRate($row['inflation_rate'])
                 ->setBeginYear($row['begin_year'])

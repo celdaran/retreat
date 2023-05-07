@@ -9,6 +9,11 @@ class AssetCollection extends Scenario
 {
     private array $assets = [];
 
+    /**
+     * Load a scenario
+     *
+     * @param string $scenarioName
+     */
     public function loadScenario(string $scenarioName)
     {
          $rows = parent::getRowsForScenario($scenarioName, $this->fetchQuery());
@@ -17,12 +22,13 @@ class AssetCollection extends Scenario
 
     /**
      * Primarily for unit testing
-     * @param array $scenario
-     * @noinspection PhpUnused
+     * @param string $scenarioName
+     * @param array $scenarios
      */
-    public function setScenario(array $scenario)
+    public function loadScenarioFromMemory(string $scenarioName, array $scenarios)
     {
-        $this->assets = $scenario;
+        $rows = $scenarios[$scenarioName];
+        $this->assets = $this->transform($rows);
     }
 
     public function getAssets(): array
@@ -33,7 +39,7 @@ class AssetCollection extends Scenario
     /**
      * Withdraw money from fund(s) until expense is matched
      */
-    public function makeWithdrawals(Period $period, Money $expense): bool
+    public function makeWithdrawals(Period $period, Money $expense): Money
     {
         $total = new Money();
 
@@ -54,44 +60,50 @@ class AssetCollection extends Scenario
 
         /** @var Asset $asset */
         foreach ($this->assets as $asset) {
-//        for ($i = 0; $i < count($this->assets); $i++) {
 
             $this->activateAssets($period);
 
             if ($asset->isActive()) {
-//            if ($this->assets[$i]['status'] === 'active') {
 
                 // Set withdrawal amount
                 $amount = new Money();
                 $amount->assign(
-                    min(
-                        $expense->value(),                   // When the full expense can be pulled from the source
-                        $asset->maxWithdrawal()->value(),    // If there's a max, cap this period's withdrawal
-                        $asset->currentBalance()->value(),   // Sometimes the current balance is the most we can pull
+                    min(// The smallest of:
+                        // The full expense pulled from the source (e.g., drawing $5,000 from a $50,000 source)
+                        $expense->value(),
+                        // Unless a maximum withdrawal amount caps the above
+                        $asset->maxWithdrawal()->value(),
+                        // Or the remaining balance in the asset covers it
+                        $asset->currentBalance()->value(),
+                        // Lastly, if we just need enough to top off the expense
+                        ($expense->value() - $total->value()),
                     )
                 );
 
                 if ($amount->le(0.00)) {
+                    $topOff = new Money();
+                    $topOff->assign($expense->value() - $total->value());
                     $this->getLog()->debug('Got a withdrawal amount of zero while pulling from asset "' . $asset->name() . '"');
                     $this->getLog()->debug('  Amount          = ' . $amount->formatted());
                     $this->getLog()->debug('  Target Expense  = ' . $expense->formatted());
                     $this->getLog()->debug('  Max Withdrawal  = ' . $asset->maxWithdrawal()->formatted());
                     $this->getLog()->debug('  Current Balance = ' . $asset->currentBalance()->formatted());
-                    $this->getLog()->debug('  Top-Off amount  = ' . ($expense->value() - $total->value()));
+                    $this->getLog()->debug('  Top-Off amount  = ' . $topOff->formatted());
                     $asset->markDepleted();
-                }
-                $msg = sprintf('Pulling %s to meet %s from asset "%s" in %4d-%02d',
-                    $amount->formatted(),
-                    $expense->formatted(),
-                    $asset->name(),
-                    $period->getYear(),
-                    $period->getMonth(),
-                );
-                $this->getLog()->debug($msg);
-                $total->add($amount->value());
+                } else {
+                    $msg = sprintf('Pulling %s to meet %s from asset "%s" in %4d-%02d',
+                        $amount->formatted(),
+                        $expense->formatted(),
+                        $asset->name(),
+                        $period->getYear(),
+                        $period->getMonth(),
+                    );
+                    $this->getLog()->debug($msg);
+                    $total->add($amount->value());
 
-                // Reduce balance by withdrawal amount
-                $asset->currentBalance()->subtract($amount->value());
+                    // Reduce balance by withdrawal amount
+                    $asset->currentBalance()->subtract($amount->value());
+                }
 
                 $msg = sprintf('Current balance of asset "%s" is %s',
                     $asset->name(),
@@ -115,10 +127,9 @@ class AssetCollection extends Scenario
                 $expense->formatted(),
             );
             $this->getLog()->warn($msg);
-            return false;
         }
 
-        return true;
+        return $total;
     }
 
     /**
