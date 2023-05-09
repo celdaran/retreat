@@ -3,3 +3,4 @@ phpunit.xml
 *~
 .tmp/
 /vendor/
+.phpunit.result.cache
