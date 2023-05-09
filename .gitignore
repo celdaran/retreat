@@ -4,3 +4,5 @@ phpunit.xml
 .tmp/
 /vendor/
 .phpunit.result.cache
+*.csv
+*.xlsx
