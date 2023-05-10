@@ -10,7 +10,12 @@ $dotenv->load();
 
 $cli = new CLI();
 
-$engine = new Engine($cli->getExpenseScenario(), $cli->getAssetScenario());
+$engine = new Engine(
+    $cli->getExpenseScenario(),
+    $cli->getAssetScenario(),
+    $cli->getTaxRate(),
+);
+
 $success = $engine->run($cli->getDuration(), $cli->getStartYear(), $cli->getStartMonth());
 if (!$success) {
     echo "Something went wrong. Starting audit...\n";

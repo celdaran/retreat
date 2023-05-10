@@ -9,6 +9,7 @@ class Engine
 {
     private string $expenseScenarioName;
     private string $assetScenarioName;
+    private float $taxRate;
 
     private ExpenseCollection $expenseCollection;
     private AssetCollection $assetCollection;
@@ -28,11 +29,12 @@ class Engine
      * method preps the engine for running a simulation and rendering
      * the results.
      */
-    public function __construct(string $expenseScenarioName = 'base', string $assetScenarioName = null)
+    public function __construct(string $expenseScenarioName = 'base', string $assetScenarioName = null, float $taxRate = 0.18)
     {
         // Get scenario names
         $this->expenseScenarioName = $expenseScenarioName;
         $this->assetScenarioName = ($assetScenarioName === null) ? $expenseScenarioName : $assetScenarioName;
+        $this->taxRate = $taxRate;
 
         // Instantiate main classes
         $this->expenseCollection = new ExpenseCollection();
@@ -80,18 +82,9 @@ class Engine
             // Start by tallying all expenses for period
             $expense = $this->getExpensesForPeriod();
 
-            // Keep a running total for tax purposes
-            $this->annualIncome->add($expense->value());
-            $this->log->debug("Annual income in period {$this->currentPeriod->getCurrentPeriod()} is {$this->annualIncome->formatted()}");
+            // Deal with income taxes
+            $this->handleIncomeTax($expense);
 
-            // If we're in the fourth period, calculate taxes
-            // Note: this has issues. But it's good enough
-            if ($this->currentPeriod->getCurrentPeriod() % 12 === 4) {
-                $taxAmount = $this->annualIncome->value() * 0.18;
-                $expense->add($taxAmount);
-                $this->log->debug("Paying income tax of $taxAmount in period {$this->currentPeriod->getCurrentPeriod()}");
-                $this->annualIncome->assign(0.00);
-            }
             // Find income to cover expenses
             $income = $this->getIncomeForPeriod($expense);
 
@@ -213,6 +206,28 @@ class Engine
         $expenses = $this->expenseCollection->tallyExpenses($this->currentPeriod);
         $this->expenseCollection->applyInflation();
         return $expenses;
+    }
+
+    private function handleIncomeTax(Money $expense)
+    {
+        // Keep a running total for tax purposes
+        $this->annualIncome->add($expense->value());
+        $this->log->debug("Annual income in period {$this->currentPeriod->getCurrentPeriod()} is {$this->annualIncome->formatted()}");
+
+        // If we're in the fourth period, calculate taxes
+        // Note: this has issues. But it's good enough
+        if ($this->currentPeriod->getCurrentPeriod() % 12 === 4) {
+            $taxAmount = $this->annualIncome->value() * $this->taxRate;
+            $expense->add($taxAmount);
+            $this->log->debug("Paying income tax of $taxAmount in period {$this->currentPeriod->getCurrentPeriod()}");
+            $this->annualIncome->assign(0.00);
+        }
+
+    }
+
+    private function getIncomeForPeriod(Money $expense): Money
+    {
+        return $this->incomeCollection->tallyIncome($this->currentPeriod);
     }
 
     /**

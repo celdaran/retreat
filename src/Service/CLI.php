@@ -9,6 +9,7 @@ class CLI
     private ?int $startYear;
     private ?int $startMonth;
     private int $duration;
+    private float $taxRate;
 
     public function __construct()
     {
@@ -26,6 +27,7 @@ class CLI
         $this->startYear = intval($climate->arguments->get('startYear'));
         $this->startMonth = intval($climate->arguments->get('startMonth'));
         $this->duration = intval($climate->arguments->get('duration'));
+        $this->taxRate = floatval($climate->arguments->get('taxRate'));
 
         if ($this->assetScenario === 'same as expense') {
             $this->assetScenario = $this->expenseScenario;
@@ -65,6 +67,11 @@ class CLI
         return $this->duration;
     }
 
+    public function getTaxRate(): float
+    {
+        return $this->taxRate;
+    }
+
     private function getConfig(): array
     {
         return [
@@ -102,6 +109,12 @@ class CLI
                 'longPrefix' => 'duration',
                 'description' => 'The duration, in months, of the simulation',
                 'defaultValue' => 360,
+            ],
+            'taxRate' => [
+                'prefix' => 't',
+                'longPrefix' => 'taxrate',
+                'description' => 'Average annual income tax rate',
+                'defaultValue' => 0.18,
             ],
 //        'adjust' => [
 //            'prefix' => 'a',
