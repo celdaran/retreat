@@ -2,6 +2,7 @@
 
 use App\Service\Data\ExpenseCollection;
 use App\Service\Data\AssetCollection;
+use App\Service\Data\IncomeCollection;
 use App\Service\Log;
 
 class Engine
@@ -11,6 +12,7 @@ class Engine
 
     private ExpenseCollection $expenseCollection;
     private AssetCollection $assetCollection;
+    private IncomeCollection $incomeCollection;
 
     private array $plan;
     private array $audit;
@@ -35,6 +37,7 @@ class Engine
         // Instantiate main classes
         $this->expenseCollection = new ExpenseCollection();
         $this->assetCollection = new AssetCollection();
+        $this->incomeCollection = new IncomeCollection();
 
         $this->plan = [];
         $this->audit = [];
@@ -59,6 +62,7 @@ class Engine
         // A "scenario" is an array of like items (an array of expenses, array of assets)
         $this->expenseCollection->loadScenario($this->expenseScenarioName);
         $this->assetCollection->loadScenario($this->assetScenarioName);
+        $this->incomeCollection->loadScenario($this->assetScenarioName);
 
         // Adjust in-memory scenarios based on requested start period
         // TODO: make this optional
@@ -88,9 +92,14 @@ class Engine
                 $this->log->debug("Paying income tax of $taxAmount in period {$this->currentPeriod->getCurrentPeriod()}");
                 $this->annualIncome->assign(0.00);
             }
+            // Find income to cover expenses
+            $income = $this->getIncomeForPeriod($expense);
 
-            // Now adjust assets based on current expenses
-            $this->adjustAssetForPeriod($expense);
+            // Pull from assets to cover remaining expenses
+            $remainingExpense = new Money();
+            $remainingExpense->assign($expense->value());
+            $remainingExpense->subtract($income->value());
+            $this->adjustAssetForPeriod($remainingExpense);
 
             // Lastly record the plan
             $planEntry = [
@@ -98,6 +107,7 @@ class Engine
                 'year' => $this->currentPeriod->getYear(),
                 'month' => $this->currentPeriod->getMonth(),
                 'expense' => $expense,
+                'income' => $this->incomeCollection->getAmounts(),
                 'assets' => $this->assetCollection->getBalances(),
             ];
             $this->plan[] = $planEntry;
@@ -115,7 +125,15 @@ class Engine
         printf("%s,%s,%s,,", 'period', 'month', 'expense');
         $i = 0;
         foreach ($this->plan as $p) {
+            // Header
             if ($i === 0) {
+                if (count($p['income']) > 0) {
+                    foreach (array_keys($p['income']) as $incomeName) {
+                        printf("\"%s\",", addslashes($incomeName));
+                    }
+                }
+                print("total income,");
+                print("net expense,,");
                 if (count($p['assets']) > 0) {
                     foreach (array_keys($p['assets']) as $assetName) {
                         printf("\"%s\",", addslashes($assetName));
@@ -123,8 +141,17 @@ class Engine
                 }
                 print("total assets\n");
             }
+
+            // Body
+            $totalIncome = 0.00;
             $totalAssets = 0.00;
             printf("%03d,%4d-%02d,%.2f,,", $p['period'], $p['year'], $p['month'], $p['expense']->value());
+            foreach ($p['income'] as $income) {
+                printf("%.2f,", $income);
+                $totalIncome += $income;
+            }
+            printf("%.2f,", $totalIncome);
+            printf("%.2f,,", $p['expense']->value() - $totalIncome);
             foreach ($p['assets'] as $asset) {
                 printf("%.2f,", $asset);
                 $totalAssets += $asset;
