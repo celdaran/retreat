@@ -16,7 +16,7 @@ class IncomeCollection extends Scenario
      */
     public function loadScenario(string $scenarioName)
     {
-         $rows = parent::getRowsForScenario($scenarioName, $this->fetchQuery());
+         $rows = parent::getRowsForScenario($scenarioName, 'income', $this->fetchQuery());
          $this->income = $this->transform($rows);
     }
 

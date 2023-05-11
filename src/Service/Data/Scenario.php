@@ -31,13 +31,13 @@ class Scenario
         return $this->log;
     }
 
-    protected function getRowsForScenario(string $scenarioName, string $sql): array
+    protected function getRowsForScenario(string $scenarioName, string $scenarioType, string $sql): array
     {
         // Get the data
         $rows = $this->data->select($sql, ['scenario_name' => $scenarioName]);
 
         if (count($rows) === 0) {
-            die("Scenario $scenarioName not found\n");
+            die("Scenario $scenarioName not found for $scenarioType\n");
         }
 
         return $rows;

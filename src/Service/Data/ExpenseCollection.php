@@ -16,7 +16,7 @@ class ExpenseCollection extends Scenario
      */
     public function loadScenario(string $scenarioName)
     {
-         $rows = parent::getRowsForScenario($scenarioName, $this->fetchQuery());
+         $rows = parent::getRowsForScenario($scenarioName, 'expense', $this->fetchQuery());
          $this->expenses = $this->transform($rows);
     }
 
