@@ -36,27 +36,33 @@ class AssetCollection extends Scenario
         return $this->assets;
     }
 
+    public function auditAssets(Period $period): array
+    {
+        $audit = [];
+
+        /** @var Asset $asset */
+        foreach ($this->assets as $asset) {
+            $audit[] = [
+                'period' => $period->getCurrentPeriod(),
+                'year' => $period->getYear(),
+                'month' => $period->getMonth(),
+                'name' => $asset->name(),
+                'opening_balance' => $asset->openingBalance()->value(),
+                'current_balance' => $asset->currentBalance()->value(),
+                'max_withdrawal' => $asset->maxWithdrawal()->value(),
+                'status' => $asset->status(),
+            ];
+        }
+
+        return $audit;
+    }
+
     /**
      * Withdraw money from fund(s) until expense is matched
      */
     public function makeWithdrawals(Period $period, Money $expense): Money
     {
         $total = new Money();
-
-        /*
-        foreach ($this->assets as $asset) {
-            $this->audit['asset'][] = [
-                'period' => $this->currentPeriod,
-                'year' => $year,
-                'month' => $month,
-                'name' => $asset['name'],
-                'opening_balance' => $asset['opening_balance'],
-                'current_balance' => $asset['current_balance'],
-                'max_withdrawal' => $asset['max_withdrawal'],
-                'status' => $asset['status'],
-            ];
-        }
-        */
 
         /** @var Asset $asset */
         foreach ($this->assets as $asset) {

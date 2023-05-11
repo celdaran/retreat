@@ -36,6 +36,25 @@ class IncomeCollection extends Scenario
         return $this->income;
     }
 
+    public function auditIncome(Period $period): array
+    {
+        $audit = [];
+
+        /** @var Income $income */
+        foreach ($this->income as $income) {
+            $audit[] = [
+                'period' => $period->getCurrentPeriod(),
+                'year' => $period->getYear(),
+                'month' => $period->getMonth(),
+                'name' => $income->name(),
+                'amount' => $income->amount()->value(),
+                'status' => $income->status(),
+            ];
+        }
+
+        return $audit;
+    }
+
     public function tallyIncome(Period $period): Money
     {
         // Activate incomes based on period

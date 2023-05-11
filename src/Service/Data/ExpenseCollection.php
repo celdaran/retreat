@@ -36,6 +36,25 @@ class ExpenseCollection extends Scenario
         return $this->expenses;
     }
 
+    public function auditExpenses(Period $period): array
+    {
+        $audit = [];
+
+        /** @var Expense $expense */
+        foreach ($this->expenses as $expense) {
+            $audit[] = [
+                'period' => $period->getCurrentPeriod(),
+                'year' => $period->getYear(),
+                'month' => $period->getMonth(),
+                'name' => $expense->name(),
+                'amount' => $expense->amount()->value(),
+                'status' => $expense->status(),
+            ];
+        }
+
+        return $audit;
+    }
+
     /**
      * Fetch initial period from database based on year and month
      *
@@ -87,16 +106,6 @@ class ExpenseCollection extends Scenario
                     $period->getCurrentPeriod(),
                 );
                 $this->getLog()->debug($msg);
-                /*
-                $this->audit['expense'][] = [
-                    'period' => $period->getCurrentPeriod(),
-                    'year' => $period->getYear(),
-                    'month' => $period->getMonth(),
-                    'name' => $expense->name(),
-                    'amount' => $expense->amount()->formatted(),
-                    'status' => $expense->status(),
-                ];
-                */
                 $total->add($expense->amount()->value());
             }
         }

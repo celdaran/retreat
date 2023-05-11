@@ -79,6 +79,8 @@ class Engine
         // Loop until the requested number of months have passed.
         while ($periods > 0) {
 
+            $this->appendToAudit();
+
             // Start by tallying all expenses for period
             $expense = $this->getExpensesForPeriod();
 
@@ -166,17 +168,29 @@ class Engine
 
     public function audit()
     {
-        foreach ($this->audit['expense'] as $e) {
-            printf("%03d,%4d-%02d,%s,%d,%s\n",
-                $e['period'], $e['year'], $e['month'],
-                $e['name'], $e['amount'], $e['status'],
-            );
+        foreach ($this->audit['expense'] as $thing) {
+            foreach ($thing as $e) {
+                printf('%03d,%4d-%02d,"%s",%0.2f,%s' . "\n",
+                    $e['period'], $e['year'], $e['month'],
+                    $e['name'], $e['amount'], $e['status'],
+                );
+            }
         }
 
-        foreach ($this->audit['asset'] as $i) {
-            printf("%03d,%4d-%02d,%s,%0.2f,%0.2f,%0.2f,%s\n", 
-                $i['period'], $i['year'], $i['month'], 
-                $i['name'], $i['opening_balance'], $i['current_balance'], $i['max_withdrawal'], $i['status']);
+        foreach ($this->audit['asset'] as $thing) {
+            foreach ($thing as $a) {
+                printf('%03d,%4d-%02d,"%s",%0.2f,%0.2f,%0.2f,%s' . "\n",
+                    $a['period'], $a['year'], $a['month'],
+                    $a['name'], $a['opening_balance'], $a['current_balance'], $a['max_withdrawal'], $a['status']);
+            }
+        }
+
+        foreach ($this->audit['income'] as $thing) {
+            foreach ($thing as $i) {
+                printf('%03d,%4d-%02d,"%s",%0.2f,%s' . "\n",
+                    $i['period'], $i['year'], $i['month'],
+                    $i['name'], $i['amount'], $i['status']);
+            }
         }
     }
 
@@ -194,6 +208,13 @@ class Engine
 //            }
 //        }
 //    }
+
+    private function appendToAudit()
+    {
+        $this->audit['expense'][] = $this->expenseCollection->auditExpenses($this->currentPeriod);
+        $this->audit['asset'][]   = $this->assetCollection->auditAssets($this->currentPeriod);
+        $this->audit['income'][]  = $this->incomeCollection->auditIncome($this->currentPeriod);
+    }
 
     /**
      * Get expenses for a given period
