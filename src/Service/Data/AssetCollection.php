@@ -216,7 +216,6 @@ class AssetCollection extends Scenario
         foreach ($rows as $row) {
             $asset = new Asset();
             $asset
-                ->setId($row['asset_id'])
                 ->setName($row['asset_name'])
                 ->setOpeningBalance(new Money((float)$row['opening_balance']))
                 ->setCurrentBalance(new Money((float)$row['opening_balance']))
