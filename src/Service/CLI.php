@@ -6,6 +6,7 @@ class CLI
 {
     private string $expenseScenario;
     private string $assetScenario;
+    private string $incomeScenario;
     private ?int $startYear;
     private ?int $startMonth;
     private int $duration;
@@ -33,6 +34,10 @@ class CLI
             $this->assetScenario = $this->expenseScenario;
         }
 
+        if ($this->incomeScenario === 'same as expense') {
+            $this->incomeScenario = $this->expenseScenario;
+        }
+
         if ($this->startYear === 0) {
             $this->startYear = null;
         }
@@ -50,6 +55,11 @@ class CLI
     public function getAssetScenario(): string
     {
         return $this->assetScenario;
+    }
+
+    public function getIncomeScenario(): string
+    {
+        return $this->incomeScenario;
     }
 
     public function getStartYear(): ?int
@@ -90,6 +100,12 @@ class CLI
                 'prefix' => 'a',
                 'longPrefix' => 'asset',
                 'description' => 'Specify the name of the asset scenario',
+                'defaultValue' => 'same as expense',
+            ],
+            'income' => [
+                'prefix' => 'i',
+                'longPrefix' => 'asset',
+                'description' => 'Specify the name of the income scenario',
                 'defaultValue' => 'same as expense',
             ],
             'startYear' => [

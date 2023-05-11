@@ -13,6 +13,7 @@ $cli = new CLI();
 $engine = new Engine(
     $cli->getExpenseScenario(),
     $cli->getAssetScenario(),
+    $cli->getIncomeScenario(),
     $cli->getTaxRate(),
 );
 
