@@ -109,8 +109,6 @@ class IncomeCollection extends Scenario
                     $income->markPlanned();
                     $income->setBeginYear($nextPeriod->getYear());
                     $income->setBeginMonth($nextPeriod->getMonth());
-                    $income->setEndYear($nextPeriod->getYear());
-                    $income->setEndMonth($nextPeriod->getMonth());
                 }
             }
         }

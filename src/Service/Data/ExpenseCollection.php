@@ -133,8 +133,6 @@ class ExpenseCollection extends Scenario
                     $expense->markPlanned();
                     $expense->setBeginYear($nextPeriod->getYear());
                     $expense->setBeginMonth($nextPeriod->getMonth());
-                    $expense->setEndYear($nextPeriod->getYear());
-                    $expense->setEndMonth($nextPeriod->getMonth());
                 }
             }
         }
