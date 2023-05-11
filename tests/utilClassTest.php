@@ -3,6 +3,7 @@
 use PHPUnit\Framework\TestCase;
 
 use App\Service\Engine\Util;
+use App\Service\Engine\Period;
 
 final class utilClassTest extends TestCase
 {
@@ -49,5 +50,105 @@ final class utilClassTest extends TestCase
 
         $interest = Util::calculateInterest(500000, 8.836);
         $this->assertEquals($interest, 3681.67);
+    }
+
+    public function testPeriodCompare1(): void
+    {
+        $period1 = new Period(2023, 1);
+        $period2 = new Period(2023, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(0, $result);
+
+        //----------------------------------------
+
+        $period1 = new Period(2023, 1);
+        $period2 = new Period(2024, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(-1, $result);
+
+        //----------------------------------------
+
+        $period1 = new Period(2024, 1);
+        $period2 = new Period(2023, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(1, $result);
+    }
+
+    public function testPeriodCompare2(): void
+    {
+        //----------------------------------------
+
+        $period1 = new Period(2023, 9);
+        $period2 = new Period(2024, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(-1, $result);
+
+        //----------------------------------------
+
+        $period1 = new Period(2024, 9);
+        $period2 = new Period(2023, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(1, $result);
+
+        //----------------------------------------
+
+        $period1 = new Period(2020, 1);
+        $period2 = new Period(2020, 2);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(-1, $result);
+
+        //----------------------------------------
+
+        $period1 = new Period(2020, 2);
+        $period2 = new Period(2020, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(1, $result);
+
+        //----------------------------------------
+
+        $period1 = new Period(2020, 12);
+        $period2 = new Period(2021, 1);
+
+        $result = Util::periodCompare(
+            $period1->getYear(), $period1->getMonth(),
+            $period2->getYear(), $period2->getMonth()
+        );
+
+        $this->assertEquals(-1, $result);
     }
 }

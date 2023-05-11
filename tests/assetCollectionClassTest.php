@@ -134,11 +134,12 @@ final class assetCollectionClassTest extends TestCase
 
         $period = new Period(2026, 1);
         $expense = new Money(50.00);
+        $expected = new Money(50.00);
 
         self::$assetCollection->activateAssets($period);
 
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(true, $success, '$50.00 can be drawn from scenario1');
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $this->assertEquals($expected, $actual, '$50.00 can be drawn from scenario1');
 
         $assets = self::$assetCollection->getAssets();
 
@@ -157,8 +158,8 @@ final class assetCollectionClassTest extends TestCase
         //-------------------------
 
         $period->advance();
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(true, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $this->assertEquals($expected, $actual);
 
         /** @var Asset $asset1 */
         $asset1 = $assets[0];
@@ -175,8 +176,8 @@ final class assetCollectionClassTest extends TestCase
         //-------------------------
 
         $period->advance();
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(true, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $this->assertEquals($expected, $actual);
 
         /** @var Asset $asset1 */
         $asset1 = $assets[0];
@@ -197,11 +198,12 @@ final class assetCollectionClassTest extends TestCase
 
         $period = new Period(2026, 1);
         $expense = new Money(50.00);
+        $expected = new Money(20.00);
 
         self::$assetCollection->activateAssets($period);
 
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(false, $success, '$50.00 is too much for scenario2');
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $this->assertEquals($expected, $actual, '$50.00 is too much for scenario2');
 
         $assets = self::$assetCollection->getAssets();
 
@@ -216,8 +218,9 @@ final class assetCollectionClassTest extends TestCase
         //-------------------------
 
         $period->advance();
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(true, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $expected = new Money(50.00);
+        $this->assertEquals($expected, $actual);
 
         /** @var Asset $asset1 */
         $asset1 = $assets[0];
@@ -238,11 +241,12 @@ final class assetCollectionClassTest extends TestCase
 
         $period = new Period(2026, 1);
         $expense = new Money(50.00);
+        $expected = new Money(20.00);
 
         self::$assetCollection->activateAssets($period);
 
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(false, $success, '$50.00 cannot be drawn for scenario3');
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $this->assertEquals($expected, $actual, '$50.00 cannot be drawn for scenario3');
 
         $assets = self::$assetCollection->getAssets();
 
@@ -265,24 +269,29 @@ final class assetCollectionClassTest extends TestCase
         //-------------------------
 
         $period->advance(); // move to period 2026-02
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(true, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $expected = new Money(50.00);
+        $this->assertEquals($expected, $actual);
 
         $period->advance(); // move to period 2026-03
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(false, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $expected = new Money(10.00);
+        $this->assertEquals($expected, $actual);
 
         $period->advance(); // move to period 2026-04
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(false, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $expected = new Money(0.00);
+        $this->assertEquals($expected, $actual);
 
         $period->advance(); // move to period 2026-05
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(false, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $expected = new Money(0.00);
+        $this->assertEquals($expected, $actual);
 
         $period->advance(); // move to period 2026-06
-        $success = self::$assetCollection->makeWithdrawals($period, $expense);
-        $this->assertEquals(true, $success);
+        $actual = self::$assetCollection->makeWithdrawals($period, $expense);
+        $expected = new Money(50.00);
+        $this->assertEquals($expected, $actual);
 
         /** @var Asset $asset1 */
         $asset1 = $assets[0];
