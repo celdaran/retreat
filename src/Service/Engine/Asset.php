@@ -214,11 +214,19 @@ class Asset {
 
     public function timeToActivate(Period $period): bool
     {
-        if (($period->getYear() >= $this->beginYear()) && ($period->getMonth() >= $this->beginMonth())) {
-            return true;
-        } else {
-            return false;
+        if ($this->isUntapped()) {
+
+            $compare = Util::periodCompare(
+                $period->getYear(), $period->getMonth(),
+                $this->beginYear(), $this->beginMonth()
+            );
+
+            if ($compare >= 0) {
+                return true;
+            }
         }
+
+        return false;
     }
 
 }

@@ -186,7 +186,11 @@ class Expense {
     public function timeToActivate(Period $period): bool
     {
         if ($this->isPlanned()) {
-            if (($period->getYear() >= $this->beginYear()) && ($period->getMonth() >= $this->beginMonth())) {
+            $compare = Util::periodCompare(
+                $period->getYear(), $period->getMonth(),
+                $this->beginYear(), $this->beginMonth()
+            );
+            if ($compare >= 0) {
                 return true;
             }
         }
@@ -194,10 +198,27 @@ class Expense {
         return false;
     }
 
+    /** @noinspection DuplicatedCode */
     public function timeToEnd(Period $period): bool
     {
         if ($this->isActive()) {
-            if (($period->getYear() >= $this->endYear()) && ($period->getMonth() >= $this->endMonth())) {
+            // If this is active and repeating then by definition it's time to end
+            if ($this->repeatEvery() !== null) {
+                return true;
+            }
+
+            // If not repeating and endYear is false, then by definition it will never end
+            if ($this->endYear() === null) {
+                return false;
+            }
+
+            // If we get this far, check dates and return result accordingly
+            $compare = Util::periodCompare(
+                $period->getYear(), $period->getMonth(),
+                $this->endYear(), $this->endMonth()
+            );
+
+            if ($compare >= 0) {
                 return true;
             }
         }
