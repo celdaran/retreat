@@ -37,7 +37,7 @@ class Scenario
         $rows = $this->data->select($sql, ['scenario_name' => $scenarioName]);
 
         if (count($rows) === 0) {
-            die("Scenario $scenarioName not found for $scenarioType\n");
+            die('Scenario "' . $scenarioName . '" not found for ' . $scenarioType . "\n");
         }
 
         return $rows;

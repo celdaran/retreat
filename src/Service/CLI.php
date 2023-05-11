@@ -25,6 +25,7 @@ class CLI
 
         $this->expenseScenario = $climate->arguments->get('expense');
         $this->assetScenario = $climate->arguments->get('asset');
+        $this->incomeScenario = $climate->arguments->get('income');
         $this->startYear = intval($climate->arguments->get('startYear'));
         $this->startMonth = intval($climate->arguments->get('startMonth'));
         $this->duration = intval($climate->arguments->get('duration'));
