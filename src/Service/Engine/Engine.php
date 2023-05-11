@@ -110,6 +110,7 @@ class Engine
                 'month' => $this->currentPeriod->getMonth(),
                 'expense' => $expense,
                 'income' => $this->incomeCollection->getAmounts(),
+                'net_expense' => $remainingExpense,
                 'assets' => $this->assetCollection->getBalances(),
             ];
             $this->plan[] = $planEntry;
@@ -124,53 +125,58 @@ class Engine
 
     public function render($format = 'csv')
     {
-        printf("%s,%s,%s,,", 'period', 'month', 'expense');
+        printf('%s,%s,%s,,', 'period', 'month', 'expense');
         $i = 0;
         foreach ($this->plan as $p) {
             // Header
             if ($i === 0) {
                 if (count($p['income']) > 0) {
                     foreach (array_keys($p['income']) as $incomeName) {
-                        printf("\"%s\",", addslashes($incomeName));
+                        printf('"%s",', addslashes($incomeName));
                     }
                 }
-                print("total income,");
-                print("net expense,,");
+                printf('"total income",');
+                printf('"net expense",,');
                 if (count($p['assets']) > 0) {
                     foreach (array_keys($p['assets']) as $assetName) {
-                        printf("\"%s\",", addslashes($assetName));
+                        printf('"%s",', addslashes($assetName));
                     }
                 }
-                print("total assets\n");
+                printf('"total assets"' . "\n");
             }
 
             // Body
             $totalIncome = 0.00;
             $totalAssets = 0.00;
-            printf("%03d,%4d-%02d,%.2f,,", $p['period'], $p['year'], $p['month'], $p['expense']->value());
+            printf('%03d,%4d-%02d,%.2f,,', $p['period'], $p['year'], $p['month'], $p['expense']->value());
             foreach ($p['income'] as $income) {
-                printf("%.2f,", $income);
+                printf('%.2f,', $income);
                 $totalIncome += $income;
             }
-            printf("%.2f,", $totalIncome);
-            printf("%.2f,,", $p['expense']->value() - $totalIncome);
+            printf('%.2f,', $totalIncome);
+            printf('%.2f,,', $p['net_expense']->value());
             foreach ($p['assets'] as $asset) {
-                printf("%.2f,", $asset);
+                printf('%.2f,', $asset);
                 $totalAssets += $asset;
             }
-            print("$totalAssets\n");
+            printf($totalAssets . "\n");
             $i++;
         }
     }
 
     public function report()
     {
+        $total = new Money();
+
         /** @var Asset $asset */
         foreach ($this->assetCollection->getAssets() as $asset) {
+            $total->add($asset->currentBalance()->value());
             printf("Asset: %s\n", $asset->name());
             printf("  Current balance: %s\n", $asset->currentBalance()->formatted());
             printf("\n");
         }
+
+        printf("Total assets: %s\n", $total->formatted());
     }
 
     public function audit()

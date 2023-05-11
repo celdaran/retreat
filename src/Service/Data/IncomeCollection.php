@@ -130,9 +130,15 @@ class IncomeCollection extends Scenario
         $amounts = [];
         /** @var Income $income */
         foreach ($this->income as $income) {
-            $amounts[$income->name()] = $formatted ?
-                $income->amount()->formatted() :
-                $income->amount()->value();
+            if ($income->isActive()) {
+                $amounts[$income->name()] = $formatted ?
+                    $income->amount()->formatted() :
+                    $income->amount()->value();
+            } else {
+                $amounts[$income->name()] = $formatted ?
+                    'Inactive' :
+                    null;
+            }
         }
         return $amounts;
     }
