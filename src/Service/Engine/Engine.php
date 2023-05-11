@@ -9,6 +9,7 @@ class Engine
 {
     private string $expenseScenarioName;
     private string $assetScenarioName;
+    private string $incomeScenarioName;
     private float $taxRate;
 
     private ExpenseCollection $expenseCollection;
@@ -29,11 +30,16 @@ class Engine
      * method preps the engine for running a simulation and rendering
      * the results.
      */
-    public function __construct(string $expenseScenarioName = 'base', string $assetScenarioName = null, float $taxRate = 0.18)
+    public function __construct(
+        string $expenseScenarioName = 'base',
+        string $assetScenarioName = null,
+        string $incomeScenarioName = null,
+        float $taxRate = 0.18)
     {
         // Get scenario names
         $this->expenseScenarioName = $expenseScenarioName;
         $this->assetScenarioName = ($assetScenarioName === null) ? $expenseScenarioName : $assetScenarioName;
+        $this->incomeScenarioName = ($incomeScenarioName === null) ? $expenseScenarioName : $incomeScenarioName;
         $this->taxRate = $taxRate;
 
         // Instantiate main classes
@@ -52,6 +58,7 @@ class Engine
         $this->audit = [
             'expense' => [],
             'asset' => [],
+            'income' => [],
         ];
     }
 
@@ -64,7 +71,7 @@ class Engine
         // A "scenario" is an array of like items (an array of expenses, array of assets)
         $this->expenseCollection->loadScenario($this->expenseScenarioName);
         $this->assetCollection->loadScenario($this->assetScenarioName);
-        $this->incomeCollection->loadScenario($this->assetScenarioName);
+        $this->incomeCollection->loadScenario($this->incomeScenarioName);
 
         // Adjust in-memory scenarios based on requested start period
         // TODO: make this optional
