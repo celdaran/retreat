@@ -66,7 +66,7 @@ class Engine
     /**
      * Core function of the engine: to take all inputs and generate a plan
      */
-    public function run(int $periods, ?int $startYear, ?int $startMonth): bool
+    public function run(int $periods, ?int $startYear = null, ?int $startMonth = null): bool
     {
         // Load scenarios
         // A "scenario" is an array of like items (an array of expenses, array of assets)
@@ -84,6 +84,16 @@ class Engine
         // Track period (year and month)
         $this->currentPeriod = $this->expenseCollection->getStart($startYear, $startMonth);
 
+        // Log it to STDOUT (for now)
+        printf("Simulation parameters:\n");
+        printf("  Expense scenario: %s\n", $this->expenseScenarioName);
+        printf("  Asset scenario: %s\n", $this->assetScenarioName);
+        printf("  Income scenario: %s\n", $this->incomeScenarioName);
+        printf("  Income Tax Rate: %.3f\n", $this->taxRate);
+        printf("  Duration: %d\n", $periods);
+        printf("  Start Year: %d\n", $this->currentPeriod->getYear());
+        printf("  Start Month: %d\n", $this->currentPeriod->getMonth());
+
         // Loop until the requested number of months have passed.
         while ($periods > 0) {
 
@@ -98,11 +108,8 @@ class Engine
             // Find income to cover expenses
             $income = $this->getIncomeForPeriod($expense);
 
-            // Pull from assets to cover remaining expenses
-            $remainingExpense = new Money();
-            $remainingExpense->assign($expense->value());
-            $remainingExpense->subtract($income->value());
-            $this->adjustAssetForPeriod($remainingExpense);
+            // Then pull from assets to cover any remaining expenses
+            $remainingExpense = $this->adjustAssetForPeriod($expense, $income);
 
             // Lastly record the plan
             $planEntry = [
@@ -122,6 +129,11 @@ class Engine
         }
 
         return true;
+    }
+
+    public function getPlan(): array
+    {
+        return $this->plan;
     }
 
     public function render($format = 'csv')
@@ -271,9 +283,13 @@ class Engine
      * 1) reducing one or more balances per the $expense per period
      * 2) increasing all balances to account for interest earned
      */
-    private function adjustAssetForPeriod(Money $expense)
+    private function adjustAssetForPeriod(Money $expense, Money $income): Money
     {
-        $total = $this->assetCollection->makeWithdrawals($this->currentPeriod, $expense);
+        $remainingExpense = new Money();
+        $remainingExpense->assign($expense->value());
+        $remainingExpense->subtract($income->value());
+
+        $total = $this->assetCollection->makeWithdrawals($this->currentPeriod, $remainingExpense);
         $this->assetCollection->earnInterest();
 
         if ($total->value() < $expense->value()) {
@@ -281,6 +297,8 @@ class Engine
             // reduce expenses to meet the available assets
             $expense->assign($total->value());
         }
+
+        return $remainingExpense;
     }
 
 }
