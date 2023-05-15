@@ -105,7 +105,7 @@ class CLI
             ],
             'income' => [
                 'prefix' => 'i',
-                'longPrefix' => 'asset',
+                'longPrefix' => 'income',
                 'description' => 'Specify the name of the income scenario',
                 'defaultValue' => 'same as expense',
             ],
