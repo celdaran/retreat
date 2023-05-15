@@ -18,13 +18,13 @@ $targetArray = [
 
 $result = [];
 
-if (($handle = fopen("quicken-merged-fixed-cleaned-5yr.csv", "r")) !== false) {
+if (($handle = fopen("quicken-merged-fixed-cleaned2-5yr.csv", "r")) !== false) {
     while (($currentRow = fgetcsv($handle, 1024, ",")) !== false) {
         if ($i > 0) {
             $transactionDate = strtotime($currentRow[0]);
             if ($startDate <= $transactionDate && $transactionDate <= $endDate) {
                 // Only look at items in this recent five-year period
-                $transactionCategory = getCategory($currentRow[5]);
+                $transactionCategory = getCategory($currentRow[5], 1);
                 $transactionAmount = getAmount($currentRow[8]);
                 increase2(
                     date('Y', $transactionDate),
@@ -63,7 +63,7 @@ foreach ($average as $category => $amount) {
     echo $category . "," . round($amount, 2) . "\n";
 }
 
-echo "All done\n";
+#echo "All done\n";
 
 //$fp = fopen('quicken-merged-fixed', 'a');
 //foreach ($output as $row) {
@@ -72,10 +72,20 @@ echo "All done\n";
 //fclose($fp);
 
 
-function getCategory($category): string
+function getCategory($category, $depth = 1): string
 {
     $part = explode(':', $category);
-    return $part[0];
+    switch ($depth) {
+        default:
+        case 1:
+            return $part[0];
+        case 2:
+            if (count($part) > 1) {
+                return $part[0] . ':' . $part[1];
+            } else {
+                return $part[0];
+            }
+    }
 }
 
 function getAmount($money): float
