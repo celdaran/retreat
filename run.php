@@ -22,5 +22,6 @@ if (!$success) {
     echo "Something went wrong. Starting audit...\n";
     $engine->audit();
 }
+#$engine->audit();
+#$engine->report();
 $engine->render();
-// $engine->report();
