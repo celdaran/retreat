@@ -7,6 +7,7 @@ use App\Service\Engine\Util;
 
 class ExpenseCollection extends Scenario
 {
+    private string $scenarioName;
     private array $expenses = [];
 
     /**
@@ -16,8 +17,9 @@ class ExpenseCollection extends Scenario
      */
     public function loadScenario(string $scenarioName)
     {
-         $rows = parent::getRowsForScenario($scenarioName, 'expense', $this->fetchQuery());
-         $this->expenses = $this->transform($rows);
+        $this->scenarioName = $scenarioName;
+        $rows = parent::getRowsForScenario($scenarioName, 'expense', $this->fetchQuery());
+        $this->expenses = $this->transform($rows);
     }
 
     /**
@@ -27,6 +29,7 @@ class ExpenseCollection extends Scenario
      */
     public function loadScenarioFromMemory(string $scenarioName, array $scenarios)
     {
+        $this->scenarioName = $scenarioName;
         $rows = $scenarios[$scenarioName];
         $this->expenses = $this->transform($rows);
     }
@@ -65,14 +68,25 @@ class ExpenseCollection extends Scenario
     public function getStart(?int $startYear, ?int $startMonth): Period
     {
         if ($startYear === null) {
-            $sql = "SELECT min(begin_year) AS startYear FROM expense";
-            $rows = $this->getData()->select($sql);
+            $sql = "
+                SELECT min(e.begin_year) AS startYear 
+                FROM expense e
+                JOIN scenario s ON s.scenario_id = e.scenario_id
+                WHERE s.scenario_name = :scenario_name"
+            ;
+            $rows = $this->getData()->select($sql, ['scenario_name' => $this->scenarioName]);
             $startYear = $rows[0]['startYear'];
         }
 
         if ($startMonth === null) {
-            $sql = "SELECT min(begin_month) AS startMonth FROM expense WHERE begin_year = :begin_year";
-            $rows = $this->getData()->select($sql, ['begin_year' => $startYear]);
+            $sql = "
+                SELECT min(e.begin_month) AS startMonth
+                FROM expense e
+                JOIN scenario s ON s.scenario_id = e.scenario_id
+                WHERE s.scenario_name = :scenario_name
+                  AND e.begin_year = :begin_year
+            ";
+            $rows = $this->getData()->select($sql, ['scenario_name' => $this->scenarioName, 'begin_year' => $startYear]);
             $startMonth = $rows[0]['startMonth'];
         }
 
