@@ -34,13 +34,14 @@ class Engine
         string $expenseScenarioName = 'base',
         string $assetScenarioName = null,
         string $incomeScenarioName = null,
-        float $taxRate = 0.18)
+        float $taxRate = null)
     {
         // Get scenario names
         $this->expenseScenarioName = $expenseScenarioName;
         $this->assetScenarioName = ($assetScenarioName === null) ? $expenseScenarioName : $assetScenarioName;
         $this->incomeScenarioName = ($incomeScenarioName === null) ? $expenseScenarioName : $incomeScenarioName;
-        $this->taxRate = $taxRate;
+        $this->taxRate = ($taxRate === 0.00) ? $_ENV['TAX_RATE'] : $taxRate;
+        $this->taxRate = ($this->taxRate === null) ? 0.18 : $this->taxRate;
 
         // Instantiate main classes
         $this->expenseCollection = new ExpenseCollection();

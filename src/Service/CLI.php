@@ -130,8 +130,8 @@ class CLI
             'taxRate' => [
                 'prefix' => 't',
                 'longPrefix' => 'taxrate',
-                'description' => 'Average annual income tax rate',
-                'defaultValue' => 0.18,
+                'description' => 'Average annual income tax rate (18% if not specified)',
+                'defaultValue' => null,
             ],
 //        'adjust' => [
 //            'prefix' => 'a',
