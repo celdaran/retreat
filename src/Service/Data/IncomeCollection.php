@@ -88,8 +88,9 @@ class IncomeCollection extends Scenario
 
         // Lastly, has it ended?
         foreach ($this->income as $income) {
-            if ($income->timeToEnd($period)) {
-                if ($income->repeatEvery() === null) {
+            $action = $income->timeToEnd($period);
+            switch ($action) {
+                case 'yep':
                     $msg = sprintf('Ending income "%s" in %4d-02%d, as planned from the start',
                         $income->name(),
                         $period->getYear(),
@@ -97,19 +98,22 @@ class IncomeCollection extends Scenario
                     );
                     $this->getLog()->debug($msg);
                     $income->markEnded();
-                } else {
-                    $msg = sprintf('Ending income "%s" in %4d-%02d, but rescheduling %s months out',
-                        $income->name(),
-                        $period->getYear(),
-                        $period->getMonth(),
-                        $income->repeatEvery(),
-                    );
-                    $this->getLog()->debug($msg);
-                    $nextPeriod = $period->addMonths($income->beginYear(), $income->beginMonth(), $income->repeatEvery());
-                    $income->markPlanned();
-                    $income->setBeginYear($nextPeriod->getYear());
-                    $income->setBeginMonth($nextPeriod->getMonth());
-                }
+                    break;
+                case 'nope':
+                    break;
+                    case 'reschedule';
+                        $msg = sprintf('Ending income "%s" in %4d-%02d, but rescheduling %s months out',
+                            $income->name(),
+                            $period->getYear(),
+                            $period->getMonth(),
+                            $income->repeatEvery(),
+                        );
+                        $this->getLog()->debug($msg);
+                        $nextPeriod = $period->addMonths($income->beginYear(), $income->beginMonth(), $income->repeatEvery());
+                        $income->markPlanned();
+                        $income->setBeginYear($nextPeriod->getYear());
+                        $income->setBeginMonth($nextPeriod->getMonth());
+                    break;
             }
         }
 

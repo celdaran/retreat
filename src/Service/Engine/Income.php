@@ -187,31 +187,36 @@ class Income {
     }
 
     /** @noinspection DuplicatedCode */
-    public function timeToEnd(Period $period): bool
+    public function timeToEnd(Period $period): string
     {
         if ($this->isActive()) {
-            // If this is active and repeating then by definition it's time to end
-            if ($this->repeatEvery() !== null) {
-                return true;
-            }
-
-            // If not repeating and endYear is false, then by definition it will never end
+            // Compare dates
             if ($this->endYear() === null) {
-                return false;
-            }
-
-            // If we get this far, check dates and return result accordingly
+                $compare = -1;
+            } else {
             $compare = Util::periodCompare(
                 $period->getYear(), $period->getMonth(),
                 $this->endYear(), $this->endMonth()
             );
+            }
 
+            // Must check repeating to determine next steps
+            if ($this->repeatEvery() === null) {
             if ($compare >= 0) {
-                return true;
+                    return 'yep';
+                } else {
+                    return 'nope';
+                }
+            } else {
+                if ($compare >= 0) {
+                    return 'yep';
+                } else {
+                    return 'reschedule';
+                }
             }
         }
 
-        return false;
+        return 'nope';
     }
 
 }

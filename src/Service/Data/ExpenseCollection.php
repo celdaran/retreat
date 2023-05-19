@@ -126,16 +126,20 @@ class ExpenseCollection extends Scenario
 
         // Lastly, has it ended?
         foreach ($this->expenses as $expense) {
-            if ($expense->timeToEnd($period)) {
-                if ($expense->repeatEvery() === null) {
-                    $msg = sprintf('Ending expense "%s" in %4d-02%d, as planned from the start',
+            $action = $expense->timeToEnd($period);
+            switch ($action) {
+                case 'yep':
+                    $msg = sprintf('Ending expense "%s" in %4d-%02d, as planned from the start',
                         $expense->name(),
                         $period->getYear(),
                         $period->getMonth(),
                     );
                     $this->getLog()->debug($msg);
                     $expense->markEnded();
-                } else {
+                    break;
+                case 'nope':
+                    break;
+                case 'reschedule':
                     $msg = sprintf('Ending expense "%s" in %4d-%02d, but rescheduling %s months out',
                         $expense->name(),
                         $period->getYear(),
@@ -147,7 +151,7 @@ class ExpenseCollection extends Scenario
                     $expense->markPlanned();
                     $expense->setBeginYear($nextPeriod->getYear());
                     $expense->setBeginMonth($nextPeriod->getMonth());
-                }
+                    break;
             }
         }
 
