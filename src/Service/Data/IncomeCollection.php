@@ -7,6 +7,7 @@ use App\Service\Engine\Util;
 
 class IncomeCollection extends Scenario
 {
+    private string $scenarioName;
     private array $income = [];
 
     /**
@@ -16,6 +17,7 @@ class IncomeCollection extends Scenario
      */
     public function loadScenario(string $scenarioName)
     {
+        $this->scenarioName = $scenarioName;
          $rows = parent::getRowsForScenario($scenarioName, 'income', $this->fetchQuery());
          $this->income = $this->transform($rows);
     }
@@ -27,6 +29,7 @@ class IncomeCollection extends Scenario
      */
     public function loadScenarioFromMemory(string $scenarioName, array $scenarios)
     {
+        $this->scenarioName = $scenarioName;
         $rows = $scenarios[$scenarioName];
         $this->income = $this->transform($rows);
     }
