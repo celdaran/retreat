@@ -143,38 +143,48 @@ class Engine
         foreach ($this->plan as $p) {
             // Header
             if ($i === 0) {
-                if (count($p['income']) > 0) {
-                    foreach (array_keys($p['income']) as $incomeName) {
-                        printf('"%s",', addslashes($incomeName));
-                    }
-                }
-                printf('"total income",');
-                printf('"net expense",,');
-                if (count($p['assets']) > 0) {
-                    foreach (array_keys($p['assets']) as $assetName) {
-                        printf('"%s",', addslashes($assetName));
-                    }
-                }
-                printf('"total assets"' . "\n");
+                $this->renderHeader($p);
             }
 
             // Body
-            $totalIncome = 0.00;
-            $totalAssets = 0.00;
-            printf('%03d,%4d-%02d,%.2f,,', $p['period'], $p['year'], $p['month'], $p['expense']->value());
-            foreach ($p['income'] as $income) {
-                printf('%.2f,', $income);
-                $totalIncome += $income;
-            }
-            printf('%.2f,', $totalIncome);
-            printf('%.2f,,', $p['net_expense']->value());
-            foreach ($p['assets'] as $asset) {
-                printf('%.2f,', $asset);
-                $totalAssets += $asset;
-            }
-            printf($totalAssets . "\n");
+            $this->renderLine($p);
             $i++;
         }
+    }
+
+    public function renderHeader(array $p)
+    {
+        if (count($p['income']) > 0) {
+            foreach (array_keys($p['income']) as $incomeName) {
+                printf('"%s",', addslashes($incomeName));
+            }
+        }
+        printf('"total income",');
+        printf('"net expense",,');
+        if (count($p['assets']) > 0) {
+            foreach (array_keys($p['assets']) as $assetName) {
+                printf('"%s",', addslashes($assetName));
+            }
+        }
+        printf('"total assets"' . "\n");
+    }
+
+    public function renderLine(array $p)
+    {
+        $totalIncome = 0.00;
+        $totalAssets = 0.00;
+        printf('%03d,%4d-%02d,%.2f,,', $p['period'], $p['year'], $p['month'], $p['expense']->value());
+        foreach ($p['income'] as $income) {
+            printf('%.2f,', $income);
+            $totalIncome += $income;
+        }
+        printf('%.2f,', $totalIncome);
+        printf('%.2f,,', $p['net_expense']->value());
+        foreach ($p['assets'] as $asset) {
+            printf('%.2f,', $asset);
+            $totalAssets += $asset;
+        }
+        printf($totalAssets . "\n");
     }
 
     public function report()
